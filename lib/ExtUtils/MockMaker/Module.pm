@@ -21,11 +21,14 @@ sub as_string {
 
   my $string = '';
 
-  for my $package ($self->packages) {
-    $string .= sprintf "package %s;\n", $package->name;
+  my $did_name;
+  for my $pkg ($self->packages) {
+    $string .= sprintf "package %s;\n", $pkg->name;
+    $string .= sprintf "our \$VERSION = '%s';\n", $pkg->version
+      if defined $pkg->version;
 
-    $string .= sprintf "our \$VERSION = '%s';\n", $package->version
-      if defined $package->version;
+    $string .= sprintf "\n=head1 NAME\n\n%s - %s\n\n=cut\n\n", $pkg->name, '?'
+      unless $did_name++;
   }
 
   $string .= "1\n";
