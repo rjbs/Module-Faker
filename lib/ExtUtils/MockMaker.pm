@@ -1,6 +1,8 @@
 package ExtUtils::MockMaker;
 use Moose;
 
+our $VERSION = '0.001';
+
 use ExtUtils::MockMaker::Dist;
 
 use File::Next ();
