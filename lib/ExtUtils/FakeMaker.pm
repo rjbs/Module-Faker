@@ -2,11 +2,30 @@ package ExtUtils::FakeMaker;
 use 5.010;
 use Moose;
 
+=head1 NAME
+
+ExtUtils::FakeMaker - build fake dists for testing CPAN tools
+
+=head1 VERSION
+
+version 0.001
+
+=cut
+
 our $VERSION = '0.001';
 
 use ExtUtils::FakeMaker::Dist;
 
 use File::Next ();
+
+=head1 SYNOPSIS
+
+  ExtUtils::FakeMaker->make_fakes({
+    source => './dir-of-specs',
+    dest   => './will-contain-tarballs',
+  });
+
+=cut
 
 has source => (is => 'ro', required => 1);
 has dest   => (is => 'ro', required => 1);
@@ -22,7 +41,7 @@ sub BUILD {
   }
 }
 
-sub make_mocks {
+sub make_fakes {
   my ($class, $arg) = @_;
 
   my $self = ref $class ? $class : $class->new($arg);
@@ -36,6 +55,15 @@ sub make_mocks {
 }
 
 sub dist_class { 'ExtUtils::FakeMaker::Dist' }
+
+=head1 COPYRIGHT AND AUTHOR
+
+This distribution was written by Ricardo Signes, E<lt>rjbs@cpan.orgE<gt>.
+
+Copyright 2008.  This is free software, released under the same terms as perl
+itself.
+
+=cut
 
 no Moose;
 1;
