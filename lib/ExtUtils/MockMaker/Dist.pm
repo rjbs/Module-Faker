@@ -103,6 +103,14 @@ sub files {
 
 sub _file_class { 'ExtUtils::MockMaker::File' }
 
+has requires => (
+  is   => 'ro',
+  isa  => 'HashRef',
+  lazy => 1,
+  default    => sub { {} },
+  auto_deref => 1,
+);
+
 has _manifest_file => (
   is   => 'ro',
   isa  => 'ExtUtils::MockMaker::File',

@@ -52,9 +52,15 @@ name: {{ $dist->name }}
 version: {{ $dist->version }}
 abstract: {{ $dist->abstract }}
 author:
-{{ $OUT .= sprintf "  - %s\n", $_ for $dist->authors; chomp $OUT }}
+{{ $OUT .= sprintf "  - %s\n", $_ for $dist->authors; chomp $OUT; return }}
 generated_by: ExtUtils::MockMaker {{ $ExtUtils::MockMaker::VERSION }}
-license: unknown
+license: unknown{{ if (my %requires = $dist->requires) {
+  $OUT .= "\nrequires:";
+  $OUT .= sprintf "\n  %s: %s", $_, ($requires{$_} // '~') for keys %requires;
+  chomp $OUT;
+}
+return;
+}}
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.3.html
   version: 1.3

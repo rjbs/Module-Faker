@@ -16,8 +16,8 @@ my $MM = 'ExtUtils::MockMaker';
 #   dest   => $tmpdir,
 # });
 
-for my $file ('eg/MetaVersion.yaml', 'eg/ProvidesInner.yaml') {
-  my $dist = $MM->dist_from_file($file);
+for my $file (qw(MetaVersion.yaml ProvidesInner.yaml SimplePrereq.yaml)) {
+  my $dist = $MM->dist_from_file("eg/$file");
 
   for my $file ($dist->files) {
     diag "=== " . $file->filename . " ===\n";
