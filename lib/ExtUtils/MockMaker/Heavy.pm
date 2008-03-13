@@ -53,7 +53,7 @@ version: {{ $dist->version }}
 abstract: {{ $dist->abstract }}
 author:
 {{ $OUT .= sprintf "  - %s\n", $_ for $dist->authors; chomp $OUT; return }}
-generated_by: ExtUtils::MockMaker {{ $ExtUtils::MockMaker::VERSION }}
+generated_by: ExtUtils::MockMaker version {{ $ExtUtils::MockMaker::VERSION }}
 license: unknown{{ if (my %requires = $dist->requires) {
   $OUT .= "\nrequires:";
   $OUT .= sprintf "\n  %s: %s", $_, ($requires{$_} // '~') for keys %requires;
