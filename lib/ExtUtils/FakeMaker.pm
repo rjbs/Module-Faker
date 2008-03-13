@@ -1,4 +1,5 @@
 package ExtUtils::FakeMaker;
+use 5.010;
 use Moose;
 
 our $VERSION = '0.001';
