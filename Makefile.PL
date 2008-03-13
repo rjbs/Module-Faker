@@ -18,4 +18,6 @@ requires('Moose',                    => 0.000); # minimum unknown
 requires('Text::Template'            => 0.000); # minimum unknown
 requires('YAML::Syck'                => 0.000); # minimum unknown
 
+author_tests('xt');
+
 WriteAll();
