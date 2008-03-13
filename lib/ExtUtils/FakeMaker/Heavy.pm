@@ -56,7 +56,7 @@ author:
 generated_by: ExtUtils::FakeMaker version {{ $ExtUtils::FakeMaker::VERSION }}
 license: unknown{{ if (my %requires = $dist->requires) {
   $OUT .= "\nrequires:";
-  $OUT .= sprintf "\n  %s: %s", $_, ($requires{$_} // '~') for keys %requires;
+  $OUT .= sprintf "\n  %s: %s", $_, (defined $requires{$_} ? $requires{$_} : '~') for keys %requires;
   chomp $OUT;
 }
 return;

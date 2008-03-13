@@ -1,5 +1,5 @@
 package ExtUtils::FakeMaker;
-use 5.010;
+use 5.008;
 use Moose;
 
 =head1 NAME

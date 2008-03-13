@@ -11,6 +11,8 @@ use File::Temp ();
 use File::Path ();
 use YAML::Syck ();
 
+sub __dor { defined $_[0] ? $_[0] : $_[1] }
+
 has name         => (is => 'ro', isa => 'Str', required => 1);
 has version      => (is => 'ro', isa => 'Maybe[Str]', default => '0.01');
 has abstract     => (is => 'ro', isa => 'Str', default => 'a great new dist');
@@ -22,7 +24,7 @@ has archive_basename => (
   lazy => 1,
   default => sub {
     my ($self) = @_;
-    return sprintf '%s-%s', $self->name, $self->version // 'undef';
+    return sprintf '%s-%s', $self->name, __dor($self->version, 'undef');
   },
 );
 
