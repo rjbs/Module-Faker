@@ -1,6 +1,8 @@
 package ExtUtils::FakeMaker::Module;
 use Moose;
 
+our $VERSION = '0.002';
+
 use ExtUtils::FakeMaker::Package;
 
 has filename => (

@@ -1,6 +1,8 @@
 package ExtUtils::FakeMaker::Dist;
 use Moose;
 
+our $VERSION = '0.002';
+
 use ExtUtils::FakeMaker::File;
 use ExtUtils::FakeMaker::Heavy;
 use ExtUtils::FakeMaker::Package;

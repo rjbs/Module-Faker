@@ -1,6 +1,8 @@
 package ExtUtils::FakeMaker::Package;
 use Moose;
 
+our $VERSION = '0.002';
+
 use Moose::Util::TypeConstraints;
 
 has name     => (is => 'ro', isa => 'Str', required => 1);

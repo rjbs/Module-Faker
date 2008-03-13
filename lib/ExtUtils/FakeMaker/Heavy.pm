@@ -2,6 +2,8 @@ use strict;
 use warnings;
 package ExtUtils::FakeMaker::Heavy;
 
+our $VERSION = '0.002';
+
 use Carp ();
 use Text::Template;
 
