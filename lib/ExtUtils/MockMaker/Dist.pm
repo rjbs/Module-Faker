@@ -1,6 +1,8 @@
 package ExtUtils::MockMaker::Dist;
 use Moose;
 
+use ExtUtils::MockMaker::File;
+use ExtUtils::MockMaker::Heavy;
 use ExtUtils::MockMaker::Package;
 use ExtUtils::MockMaker::Module;
 
@@ -9,6 +11,7 @@ use File::Temp ();
 
 has name         => (is => 'ro', isa => 'Str', required => 1);
 has version      => (is => 'ro', isa => 'Maybe[Str]', default => '0.01');
+has abstract     => (is => 'ro', isa => 'Str', default => 'a great new dist');
 has archive_ext  => (is => 'ro', isa => 'Str', default => 'tar.gz');
 
 has archive_basename => (
@@ -19,6 +22,13 @@ has archive_basename => (
     my ($self) = @_;
     return sprintf '%s-%s', $self->name, $self->version // 'undef';
   },
+);
+
+has authors => (
+  is  => 'ro',
+  isa => 'ArrayRef[Str]',
+  auto_deref => 1,
+  default    => sub { [ 'Local Author <local@cpan.local>' ] },
 );
 
 sub __dist_to_pkg { my $str = shift; $str =~ s/-/::/g; return $str; }
@@ -76,7 +86,7 @@ sub make_dist {
 
   $archive->container($container);
 
-  for my $file ($self->modules) {
+  for my $file ($self->files) {
     $archive->add_file($file->filename, $file->as_string);
   }
 
@@ -85,5 +95,53 @@ sub make_dist {
 
   return $archive_filename;
 }
+
+sub files {
+  my ($self) = @_;
+  return ($self->modules, $self->_extras, $self->_manifest_file);
+}
+
+sub _file_class { 'ExtUtils::MockMaker::File' }
+
+has _manifest_file => (
+  is   => 'ro',
+  isa  => 'ExtUtils::MockMaker::File',
+  lazy => 1,
+  default => sub {
+    my ($self) = @_;
+    my @files = ($self->modules, $self->_extras);
+
+    return $self->_file_class->new({
+      filename => 'MANIFEST',
+      content  => join("\n",
+        'MANIFEST',
+        map { $_->filename } @files
+      ),
+    });
+  },
+);
+    
+has _extras => (
+  is   => 'ro',
+  isa  => 'ArrayRef[ExtUtils::MockMaker::File]',
+  lazy => 1,
+  auto_deref => 1,
+  default    => sub {
+    my ($self) = @_;
+    my @files;
+
+    for my $filename (qw(Makefile.PL META.yml t/00-nop.t)) {
+      push @files, $self->_file_class->new({
+        filename => $filename,
+        content  => ExtUtils::MockMaker::Heavy->_render(
+          $filename,
+          { dist => $self },
+        ),
+      });
+    }
+
+    return \@files;
+  },
+);
 
 1;

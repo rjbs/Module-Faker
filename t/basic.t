@@ -19,12 +19,12 @@ my $MM = 'ExtUtils::MockMaker';
 for my $file ('eg/MetaVersion.yaml', 'eg/ProvidesInner.yaml') {
   my $dist = $MM->dist_from_file($file);
 
-  for my $module ($dist->modules) {
-    diag "=== " . $module->filename . " ===\n";
-    diag $module->as_string;
+  for my $file ($dist->files) {
+    diag "=== " . $file->filename . " ===\n";
+    diag $file->as_string;
   }
 
-  diag $dist->make_dist;
+  # diag $dist->make_dist;
 }
 
 ok(1, 'this test intentionally left passing');
