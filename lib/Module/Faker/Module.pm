@@ -1,9 +1,9 @@
-package ExtUtils::FakeMaker::Module;
+package Module::Faker::Module;
 use Moose;
 
 our $VERSION = '0.002';
 
-use ExtUtils::FakeMaker::Package;
+use Module::Faker::Package;
 
 has filename => (
   is  => 'ro',
@@ -13,7 +13,7 @@ has filename => (
 
 has packages => (
   is         => 'ro',
-  isa        => 'ArrayRef[ExtUtils::FakeMaker::Package]',
+  isa        => 'ArrayRef[Module::Faker::Package]',
   required   => 1,
   auto_deref => 1,
 );

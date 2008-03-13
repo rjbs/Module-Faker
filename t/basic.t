@@ -3,14 +3,14 @@ use warnings;
 
 use Test::More tests => 2;
 
-use ExtUtils::FakeMaker;
+use Module::Faker;
 use File::Temp ();
 
-my $MF = 'ExtUtils::FakeMaker';
+my $MF = 'Module::Faker';
 
 my $tmpdir = File::Temp::tempdir(CLEANUP => 1);
 
-ExtUtils::FakeMaker->make_fakes({
+$MF->make_fakes({
   source => './eg',
   dest   => $tmpdir,
 });

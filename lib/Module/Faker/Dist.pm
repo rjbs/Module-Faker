@@ -1,12 +1,12 @@
-package ExtUtils::FakeMaker::Dist;
+package Module::Faker::Dist;
 use Moose;
 
 our $VERSION = '0.002';
 
-use ExtUtils::FakeMaker::File;
-use ExtUtils::FakeMaker::Heavy;
-use ExtUtils::FakeMaker::Package;
-use ExtUtils::FakeMaker::Module;
+use Module::Faker::File;
+use Module::Faker::Heavy;
+use Module::Faker::Package;
+use Module::Faker::Module;
 
 use Archive::Any::Create;
 use File::Temp ();
@@ -51,7 +51,7 @@ sub _pkgy_name {
 
 has provides => (
   is     => 'ro',
-  isa    => 'ExtUtils::FakeMaker::Type::Packages',
+  isa    => 'Module::Faker::Type::Packages',
   lazy   => 1,
   coerce => 1,
   required   => 1,
@@ -59,7 +59,7 @@ has provides => (
     my ($self) = @_;
     my $pkg = __dist_to_pkg($self->name);
     return [
-      ExtUtils::FakeMaker::Package->new({
+      Module::Faker::Package->new({
         name    => $pkg,
         version => $self->version,
         in_file => __pkg_to_file($pkg),
@@ -80,7 +80,7 @@ sub modules {
   }
 
   my @modules = map {
-    ExtUtils::FakeMaker::Module->new({
+    Module::Faker::Module->new({
       packages => $module{$_},
       filename => $_,
     });
@@ -136,7 +136,7 @@ sub files {
   return ($self->modules, $self->_extras, $self->_manifest_file);
 }
 
-sub _file_class { 'ExtUtils::FakeMaker::File' }
+sub _file_class { 'Module::Faker::File' }
 
 has requires => (
   is   => 'ro',
@@ -148,7 +148,7 @@ has requires => (
 
 has _manifest_file => (
   is   => 'ro',
-  isa  => 'ExtUtils::FakeMaker::File',
+  isa  => 'Module::Faker::File',
   lazy => 1,
   default => sub {
     my ($self) = @_;
@@ -166,7 +166,7 @@ has _manifest_file => (
     
 has _extras => (
   is   => 'ro',
-  isa  => 'ArrayRef[ExtUtils::FakeMaker::File]',
+  isa  => 'ArrayRef[Module::Faker::File]',
   lazy => 1,
   auto_deref => 1,
   default    => sub {
@@ -176,7 +176,7 @@ has _extras => (
     for my $filename (qw(Makefile.PL META.yml t/00-nop.t)) {
       push @files, $self->_file_class->new({
         filename => $filename,
-        content  => ExtUtils::FakeMaker::Heavy->_render(
+        content  => Module::Faker::Heavy->_render(
           $filename,
           { dist => $self },
         ),

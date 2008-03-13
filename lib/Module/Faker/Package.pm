@@ -1,4 +1,4 @@
-package ExtUtils::FakeMaker::Package;
+package Module::Faker::Package;
 use Moose;
 
 our $VERSION = '0.002';
@@ -12,10 +12,10 @@ has abstract => (is => 'ro', isa => 'Maybe[Str]');
 # TODO: default this in from name -- rjbs, 2008-03-12
 has in_file => (is => 'ro', isa => 'Str', required => 1);
 
-subtype 'ExtUtils::FakeMaker::Type::Packages'
-  => as 'ArrayRef[ExtUtils::FakeMaker::Package]';
+subtype 'Module::Faker::Type::Packages'
+  => as 'ArrayRef[Module::Faker::Package]';
 
-coerce 'ExtUtils::FakeMaker::Type::Packages'
+coerce 'Module::Faker::Type::Packages'
   => from 'HashRef'
   => via  {
     my ($href) = @_;

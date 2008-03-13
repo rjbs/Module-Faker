@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package ExtUtils::FakeMaker::Heavy;
+package Module::Faker::Heavy;
 
 our $VERSION = '0.002';
 
@@ -55,7 +55,7 @@ version: {{ $dist->version }}
 abstract: {{ $dist->abstract }}
 author:
 {{ $OUT .= sprintf "  - %s\n", $_ for $dist->authors; chomp $OUT; return }}
-generated_by: ExtUtils::FakeMaker version {{ $ExtUtils::FakeMaker::VERSION }}
+generated_by: Module::Faker version {{ $Module::Faker::VERSION }}
 license: unknown{{ if (my %requires = $dist->requires) {
   $OUT .= "\nrequires:";
   $OUT .= sprintf "\n  %s: %s", $_, (defined $requires{$_} ? $requires{$_} : '~') for keys %requires;

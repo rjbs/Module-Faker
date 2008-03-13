@@ -4,10 +4,10 @@ use warnings;
 
 use inc::Module::Install;
 
-name          ('ExtUtils-FakeMaker');
+name          ('Module-Faker');
 author        ('Ricardo Signes <rjbs@cpan.org>');
 license       ('perl');
-all_from      ('lib/ExtUtils/FakeMaker.pm');
+all_from      ('lib/Module/Faker.pm');
 
 requires('Archive::Any::Create'      => 0.000); # minimum unknown
 requires('File::Next'                => 0.000); # minimum unknown

@@ -1,10 +1,10 @@
-package ExtUtils::FakeMaker;
+package Module::Faker;
 use 5.008;
 use Moose;
 
 =head1 NAME
 
-ExtUtils::FakeMaker - build fake dists for testing CPAN tools
+Module::Faker - build fake dists for testing CPAN tools
 
 =head1 VERSION
 
@@ -14,13 +14,13 @@ version 0.002
 
 our $VERSION = '0.002';
 
-use ExtUtils::FakeMaker::Dist;
+use Module::Faker::Dist;
 
 use File::Next ();
 
 =head1 SYNOPSIS
 
-  ExtUtils::FakeMaker->make_fakes({
+  Module::Faker->make_fakes({
     source => './dir-of-specs',
     dest   => './will-contain-tarballs',
   });
@@ -54,7 +54,7 @@ sub make_fakes {
   }
 }
 
-sub dist_class { 'ExtUtils::FakeMaker::Dist' }
+sub dist_class { 'Module::Faker::Dist' }
 
 =head1 COPYRIGHT AND AUTHOR
 
