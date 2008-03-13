@@ -23,6 +23,8 @@ for my $file ('eg/MetaVersion.yaml', 'eg/ProvidesInner.yaml') {
     diag "=== " . $module->filename . " ===\n";
     diag $module->as_string;
   }
+
+  diag $dist->make_dist;
 }
 
 ok(1, 'this test intentionally left passing');
