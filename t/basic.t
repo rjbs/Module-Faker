@@ -10,7 +10,7 @@ my $MF = 'ExtUtils::FakeMaker';
 
 my $tmpdir = File::Temp::tempdir(CLEANUP => 1);
 
-ExtUtils::FakeMaker->make_mocks({
+ExtUtils::FakeMaker->make_fakes({
   source => './eg',
   dest   => $tmpdir,
 });
