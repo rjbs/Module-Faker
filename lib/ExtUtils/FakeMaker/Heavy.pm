@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package ExtUtils::MockMaker::Heavy;
+package ExtUtils::FakeMaker::Heavy;
 
 use Carp ();
 use Text::Template;
@@ -53,7 +53,7 @@ version: {{ $dist->version }}
 abstract: {{ $dist->abstract }}
 author:
 {{ $OUT .= sprintf "  - %s\n", $_ for $dist->authors; chomp $OUT; return }}
-generated_by: ExtUtils::MockMaker version {{ $ExtUtils::MockMaker::VERSION }}
+generated_by: ExtUtils::FakeMaker version {{ $ExtUtils::FakeMaker::VERSION }}
 license: unknown{{ if (my %requires = $dist->requires) {
   $OUT .= "\nrequires:";
   $OUT .= sprintf "\n  %s: %s", $_, ($requires{$_} // '~') for keys %requires;
@@ -68,9 +68,10 @@ __Makefile.PL__
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-  DISTNAME        => "{{ $dist->name }}",
-  VERSION         => "{{ $dist->version }}",
-  ABSTRACT        => '{{ my $abs = $dist->abstract; $abs =~ s/'/\'/g; $abs }}',
+  DISTNAME => "{{ $dist->name }}",
+  NAME     => "{{ $dist->_pkgy_name }}",
+  VERSION  => "{{ $dist->version }}",
+  ABSTRACT => '{{ my $abs = $dist->abstract; $abs =~ s/'/\'/g; $abs }}',
 );
 __t/00-nop.t__
 #!perl

@@ -1,7 +1,7 @@
-package ExtUtils::MockMaker::Module;
+package ExtUtils::FakeMaker::Module;
 use Moose;
 
-use ExtUtils::MockMaker::Package;
+use ExtUtils::FakeMaker::Package;
 
 has filename => (
   is  => 'ro',
@@ -11,7 +11,7 @@ has filename => (
 
 has packages => (
   is         => 'ro',
-  isa        => 'ArrayRef[ExtUtils::MockMaker::Package]',
+  isa        => 'ArrayRef[ExtUtils::FakeMaker::Package]',
   required   => 1,
   auto_deref => 1,
 );

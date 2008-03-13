@@ -1,4 +1,4 @@
-package ExtUtils::MockMaker::Package;
+package ExtUtils::FakeMaker::Package;
 use Moose;
 
 use Moose::Util::TypeConstraints;
@@ -10,10 +10,10 @@ has abstract => (is => 'ro', isa => 'Maybe[Str]');
 # TODO: default this in from name -- rjbs, 2008-03-12
 has in_file => (is => 'ro', isa => 'Str', required => 1);
 
-subtype 'ExtUtils::MockMaker::Type::Packages'
-  => as 'ArrayRef[ExtUtils::MockMaker::Package]';
+subtype 'ExtUtils::FakeMaker::Type::Packages'
+  => as 'ArrayRef[ExtUtils::FakeMaker::Package]';
 
-coerce 'ExtUtils::MockMaker::Type::Packages'
+coerce 'ExtUtils::FakeMaker::Type::Packages'
   => from 'HashRef'
   => via  {
     my ($href) = @_;

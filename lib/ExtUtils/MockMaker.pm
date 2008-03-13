@@ -1,21 +1,14 @@
-package ExtUtils::MockMaker;
+package ExtUtils::FakeMaker;
 use Moose;
 
 our $VERSION = '0.001';
 
-use ExtUtils::MockMaker::Dist;
+use ExtUtils::FakeMaker::Dist;
 
 use File::Next ();
-use YAML::Syck ();
 
 has source => (is => 'ro', required => 1);
 has dest   => (is => 'ro', required => 1);
-
-# TODO: make this a registry -- rjbs, 2008-03-12
-my %HANDLER_FOR = (
-  yaml => '_from_yaml_file',
-  yml  => '_from_yaml_file',
-);
 
 sub BUILD {
   my ($self) = @_;
@@ -33,32 +26,15 @@ sub make_mocks {
 
   my $self = ref $class ? $class : $class->new($arg);
 
-  my $iter = File::Next::files($arg->{source});
+  my $iter = File::Next::files($self->source);
 
   while (my $file = $iter->()) {
-    my $dist = $self->dist_from_file($file);
+    my $dist = $self->dist_class->from_file($file);
+    $dist->make_archive({ dir => $self->dest });
   }
 }
 
-sub dist_class { 'ExtUtils::MockMaker::Dist' }
-
-sub dist_from_file {
-  my ($self, $filename) = @_;
-
-  my ($ext) = $filename =~ /\.(.+?)\z/;
-
-  Carp::croak "don't know how to handle file $filename"
-    unless $ext and my $method = $HANDLER_FOR{$ext};
-
-  $self->$method($filename);
-}
-
-sub _from_yaml_file {
-  my ($self, $filename) = @_;
-
-  my $data = YAML::Syck::LoadFile($filename);
-  my $dist = $self->dist_class->new($data);
-}
+sub dist_class { 'ExtUtils::FakeMaker::Dist' }
 
 no Moose;
 1;

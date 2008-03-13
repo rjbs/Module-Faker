@@ -1,4 +1,4 @@
-package ExtUtils::MockMaker::File;
+package ExtUtils::FakeMaker::File;
 use Moose;
 
 has filename => (is => 'ro', isa => 'Str', required => 1);
