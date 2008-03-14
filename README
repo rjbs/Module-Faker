@@ -1,4 +1,4 @@
 
-ExtUtils-FakeMaker contains tools for building fake CPAN distributions for
-testing.  For more information, consult the inline POD (documentation).
+Module-Faker contains tools for building fake CPAN distributions for testing.
+For more information, consult the inline POD (documentation).
 

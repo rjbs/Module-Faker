@@ -18,6 +18,7 @@ sub __dor { defined $_[0] ? $_[0] : $_[1] }
 has name         => (is => 'ro', isa => 'Str', required => 1);
 has version      => (is => 'ro', isa => 'Maybe[Str]', default => '0.01');
 has abstract     => (is => 'ro', isa => 'Str', default => 'a great new dist');
+has cpan_author  => (is => 'ro', isa => 'Maybe[Str]', default => 'LOCAL');
 has archive_ext  => (is => 'ro', isa => 'Str', default => 'tar.gz');
 
 has archive_basename => (
@@ -89,6 +90,14 @@ sub modules {
   return @modules;
 }
 
+sub _mk_container_path {
+  my ($self, $filename) = @_;
+
+  my (@parts) = File::Spec->splitdir($filename);
+  my $leaf_filename = pop @parts;
+  File::Path::mkpath(File::Spec->catdir(@parts));
+}
+
 sub make_dist_dir {
   my ($self, $arg) = @_;
   $arg ||= {};
@@ -98,15 +107,37 @@ sub make_dist_dir {
 
   for my $file ($self->files) {
     my $fqfn = File::Spec->catfile($dist_dir, $file->filename);
-    my (@parts) = File::Spec->splitdir($fqfn);
-    my $leaf_filename = pop @parts;
-    File::Path::mkpath(File::Spec->catdir(@parts));
+    $self->_mk_container_path($fqfn);
+
     open my $fh, '>', $fqfn or die "couldn't open $fqfn for writing: $!";
     print $fh $file->as_string;
     close $fh or die "error when closing $fqfn: $!";
   }
 
   return $dist_dir;
+}
+
+sub _author_dir_infix {
+  my ($self) = @_;
+
+  Carp::croak "can't put archive in author dir with no author defined"
+    unless my $pauseid = $self->cpan_author;
+  
+  # Sorta like pow- pow- power-wheels! -- rjbs, 2008-03-14
+  my ($pa, $p) = $pauseid =~ /^((.).)/;
+  return ($p, $pa, $pauseid);
+}
+
+sub archive_filename {
+  my ($self, $arg) = @_;
+
+  my $base = $self->archive_basename;
+  my $ext  = $self->archive_ext;
+
+  return File::Spec->catfile(
+    ($arg->{author_prefix} ? $self->_author_dir_infix : ()),
+    "$base.$ext",
+  );
 }
 
 sub make_archive {
@@ -117,7 +148,6 @@ sub make_archive {
 
   my $archive   = Archive::Any::Create->new;
   my $container = $self->archive_basename;
-  my $ext       = $self->archive_ext;
 
   $archive->container($container);
 
@@ -125,7 +155,12 @@ sub make_archive {
     $archive->add_file($file->filename, $file->as_string);
   }
 
-  my $archive_filename = File::Spec->catfile($dir, "$container.$ext");
+  my $archive_filename = File::Spec->catfile(
+    $dir,
+    $self->archive_filename({ author_prefix => $arg->{author_prefix} })
+  );
+
+  $self->_mk_container_path($archive_filename);
   $archive->write_file($archive_filename);
 
   return $archive_filename;
