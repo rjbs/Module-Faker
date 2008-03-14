@@ -1,6 +1,6 @@
 Revision history for Module-Faker
 
-0.003     ?
+0.003     2008-03-14
           renamed from ExtUtils-FakeMaker; MSCHWERN notes that ExtUtils is
           basically a misunderstood and deprecated namespace
 

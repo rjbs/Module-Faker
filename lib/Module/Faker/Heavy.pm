@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Module::Faker::Heavy;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Carp ();
 use Text::Template;
