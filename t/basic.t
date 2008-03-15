@@ -20,4 +20,7 @@ ok(
   "we got the mostly-auto dist",
 );
 
+my $dist = Module::Faker::Dist->from_file('./eg/RJBS-Dist.yaml');
+is($dist->cpan_author, 'RJBS', "get cpan author from Faker section");
+
 ok(1, 'this test intentionally left passing');

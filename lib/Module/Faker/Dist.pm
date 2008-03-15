@@ -231,7 +231,7 @@ my %HANDLER_FOR = (
 sub from_file {
   my ($self, $filename) = @_;
 
-  my ($ext) = $filename =~ /\.(.+?)\z/;
+  my ($ext) = $filename =~ /.*\.(.+?)\z/;
 
   Carp::croak "don't know how to handle file $filename"
     unless $ext and my $method = $HANDLER_FOR{$ext};
@@ -243,7 +243,8 @@ sub _from_yaml_file {
   my ($self, $filename) = @_;
 
   my $data = YAML::Syck::LoadFile($filename);
-  my $dist = $self->new($data);
+  my $extra = (delete $data->{Faker}) || {};
+  my $dist = $self->new({ %$data, %$extra });
 }
 
 1;
