@@ -14,7 +14,7 @@ requires('File::Next'                => 0.000); # minimum unknown
 requires('File::Path'                => 0.000); # minimum unknown
 requires('File::Spec'                => 0.000); # minimum unknown
 requires('File::Temp'                => 0.000); # minimum unknown
-requires('Moose',                    => 0.000); # minimum unknown
+requires('Moose',                    => 0.33 ); # param. containers
 requires('Text::Template'            => 0.000); # minimum unknown
 requires('YAML::Syck'                => 0.000); # minimum unknown
 
