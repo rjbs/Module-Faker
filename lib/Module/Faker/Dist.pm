@@ -1,7 +1,7 @@
 package Module::Faker::Dist;
 use Moose;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Module::Faker::File;
 use Module::Faker::Heavy;
