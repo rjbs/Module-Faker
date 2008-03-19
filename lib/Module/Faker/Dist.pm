@@ -173,6 +173,12 @@ sub files {
 
 sub _file_class { 'Module::Faker::File' }
 
+has omitted_files => (
+  is   => 'ro',
+  isa  => 'ArrayRef[Str]',
+  auto_deref => 1,
+);
+
 has requires => (
   is   => 'ro',
   isa  => 'HashRef',
@@ -209,6 +215,7 @@ has _extras => (
     my @files;
 
     for my $filename (qw(Makefile.PL META.yml t/00-nop.t)) {
+      next if grep { $_ eq $filename } $self->omitted_files;
       push @files, $self->_file_class->new({
         filename => $filename,
         content  => Module::Faker::Heavy->_render(
