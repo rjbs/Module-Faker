@@ -1,0 +1,6 @@
+--- #YAML:1.0
+name: Lacks-META
+abstract: this dist has no META.yaml
+Faker:
+  omitted_files:
+    - META.yml 
