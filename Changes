@@ -1,5 +1,8 @@
 Revision history for Module-Faker
 
+0.005     2008-03-20
+          add (possibly to-be-renamed) Faker.order key to provides
+
 0.004     2008-03-15
           add omitted_files option (and test)
           add some documentation

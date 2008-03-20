@@ -1,7 +1,7 @@
 package Module::Faker::Module;
 use Moose;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Module::Faker::Package;
 
