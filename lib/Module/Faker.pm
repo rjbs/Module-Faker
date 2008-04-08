@@ -8,11 +8,11 @@ Module::Faker - build fake dists for testing CPAN tools
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =cut
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Module::Faker::Dist;
 
