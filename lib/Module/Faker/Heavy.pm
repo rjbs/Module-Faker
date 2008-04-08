@@ -74,6 +74,14 @@ WriteMakefile(
   NAME     => "{{ $dist->_pkgy_name }}",
   VERSION  => "{{ $dist->version }}",
   ABSTRACT => '{{ my $abs = $dist->abstract; $abs =~ s/'/\'/g; $abs }}',
+  PREREQ_PM => { {{
+if (my %requires = $dist->requires) {
+  $OUT .= sprintf "\n    '%s' => '%s',", $_,
+    (defined $requires{$_} ?  $requires{$_} : 0) for keys %requires;
+}
+return;
+  }}
+  },
 );
 __t/00-nop.t__
 #!perl
