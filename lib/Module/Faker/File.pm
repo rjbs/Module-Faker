@@ -1,8 +1,6 @@
 package Module::Faker::File;
 use Moose;
 
-our $VERSION = '0.006';
-
 has filename => (is => 'ro', isa => 'Str', required => 1);
 has content  => (is => 'ro', isa => 'Str', required => 1);
 

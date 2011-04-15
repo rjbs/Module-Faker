@@ -1,8 +1,6 @@
 package Module::Faker::Package;
 use Moose;
 
-our $VERSION = '0.006';
-
 use Moose::Util::TypeConstraints;
 
 has name     => (is => 'ro', isa => 'Str', required => 1);

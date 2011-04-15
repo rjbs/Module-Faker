@@ -1,8 +1,6 @@
 package Module::Faker::Module;
 use Moose;
 
-our $VERSION = '0.006';
-
 use Module::Faker::Package;
 
 has filename => (

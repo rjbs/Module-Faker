@@ -2,8 +2,6 @@ use strict;
 use warnings;
 package Module::Faker::Heavy;
 
-our $VERSION = '0.006';
-
 use Carp ();
 use Text::Template;
 

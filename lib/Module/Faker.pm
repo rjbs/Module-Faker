@@ -1,18 +1,7 @@
 package Module::Faker;
 use 5.008;
-use Moose;
-
-=head1 NAME
-
-Module::Faker - build fake dists for testing CPAN tools
-
-=head1 VERSION
-
-version 0.006
-
-=cut
-
-our $VERSION = '0.006';
+use Moose 0.33;
+# ABSTRACT: build fake dists for testing CPAN tools
 
 use Module::Faker::Dist;
 
@@ -33,9 +22,7 @@ operate against CPAN distributions without having to use real CPAN
 distributions.  This is much more useful when testing an entire CPAN instance,
 rather than a single distribution, for which see L<CPAN::Faker|CPAN::Faker>.
 
-=head1 METHODS
-
-=head2 make_fakes
+=method make_fakes
 
   Module::Faker->make_fakes(\%arg);
 
@@ -43,7 +30,7 @@ This method creates a new Module::Faker and builds archives in its destination
 directory for every dist-describing file in its source directory.  See the
 L</new> method below.
 
-=head2 new
+=method new
 
   my $faker = Module::Faker->new(\%arg);
 
@@ -92,15 +79,6 @@ sub make_fakes {
     $dist->make_archive({ dir => $self->dest });
   }
 }
-
-=head1 COPYRIGHT AND AUTHOR
-
-This distribution was written by Ricardo Signes, E<lt>rjbs@cpan.orgE<gt>.
-
-Copyright 2008.  This is free software, released under the same terms as perl
-itself.
-
-=cut
 
 no Moose;
 1;

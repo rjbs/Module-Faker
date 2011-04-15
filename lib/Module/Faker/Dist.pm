@@ -2,8 +2,6 @@ package Module::Faker::Dist;
 use Moose;
 use 5.10.0;
 
-our $VERSION = '0.006';
-
 use Module::Faker::File;
 use Module::Faker::Heavy;
 use Module::Faker::Package;
