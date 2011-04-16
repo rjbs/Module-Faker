@@ -1,6 +1,8 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+
+0.007     2011-04-16 18:02:12 Europe/Amsterdam
           "Faker" key in meta files is now "X_Module_Faker"
 
           build fake dists from .json files, too
