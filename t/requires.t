@@ -5,7 +5,7 @@ use Test::More tests => 1;
 
 use Module::Faker::Dist;
 
-my $dist = Module::Faker::Dist->from_file('./eg/Simple-Prereq.yaml');
+my $dist = Module::Faker::Dist->from_file('./eg/Simple-Prereq.yml');
 my $dir = $dist->make_dist_dir;
 open my $fh, '<', "$dir/Makefile.PL" or die "Can't open $dir/Makefile.PL: $!";
 my $data = do { local $/; <$fh> };

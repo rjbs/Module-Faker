@@ -10,7 +10,7 @@ my $MFD = 'Module::Faker::Dist';
 
 my $tmpdir = File::Temp::tempdir(CLEANUP => 1);
 
-my $dist = $MFD->from_file('./eg/Provides-Inner-Sorted.yaml');
+my $dist = $MFD->from_file('./eg/Provides-Inner-Sorted.yml');
 
 isa_ok($dist, $MFD);
 

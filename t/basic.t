@@ -20,5 +20,5 @@ ok(
   "we got the mostly-auto dist",
 );
 
-my $dist = Module::Faker::Dist->from_file('./eg/RJBS-Dist.yaml');
+my $dist = Module::Faker::Dist->from_file('./eg/RJBS-Dist.yml');
 is($dist->cpan_author, 'RJBS', "get cpan author from Faker section");
