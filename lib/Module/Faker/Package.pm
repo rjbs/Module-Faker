@@ -30,7 +30,7 @@ coerce 'Module::Faker::Type::Packages'
 
     my @pkg_names = do {
       no warnings 'uninitialized';
-      sort { $href->{$a}{Faker}{order} <=> $href->{$b}{Faker}{order} } keys %$href;
+      sort { $href->{$a}{X_Module_Faker}{order} <=> $href->{$b}{X_Module_Faker}{order} } keys %$href;
     };
 
     for my $name (@pkg_names) {

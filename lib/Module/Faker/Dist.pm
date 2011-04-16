@@ -247,7 +247,7 @@ sub _from_yaml_file {
   my ($self, $filename) = @_;
 
   my $data = YAML::Syck::LoadFile($filename);
-  my $extra = (delete $data->{Faker}) || {};
+  my $extra = (delete $data->{X_Module_Faker}) || {};
   my $dist = $self->new({ %$data, %$extra });
 }
 
