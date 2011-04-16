@@ -10,7 +10,7 @@ my $MFD = 'Module::Faker::Dist';
 
 my $tmpdir = File::Temp::tempdir(CLEANUP => 1);
 
-my $dist = $MFD->from_file('./eg/Lacks-META.yml');
+my $dist = $MFD->from_file('./eg/Lacks-META.json');
 
 isa_ok($dist, $MFD);
 

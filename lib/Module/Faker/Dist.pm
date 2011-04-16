@@ -10,6 +10,7 @@ use Module::Faker::Module;
 use Archive::Any::Create;
 use File::Temp ();
 use File::Path ();
+use Parse::CPAN::Meta 1.4401;
 use YAML::Syck ();
 
 has name         => (is => 'ro', isa => 'Str', required => 1);
@@ -119,7 +120,7 @@ sub _author_dir_infix {
 
   Carp::croak "can't put archive in author dir with no author defined"
     unless my $pauseid = $self->cpan_author;
-  
+
   # Sorta like pow- pow- power-wheels! -- rjbs, 2008-03-14
   my ($pa, $p) = $pauseid =~ /^((.).)/;
   return ($p, $pa, $pauseid);
@@ -201,7 +202,7 @@ has _manifest_file => (
     });
   },
 );
-    
+
 has _extras => (
   is   => 'ro',
   isa  => 'ArrayRef[Module::Faker::File]',
@@ -228,8 +229,9 @@ has _extras => (
 
 # TODO: make this a registry -- rjbs, 2008-03-12
 my %HANDLER_FOR = (
-  yaml => '_from_yaml_file',
-  yml  => '_from_yaml_file',
+  yaml => '_from_meta_file',
+  yml  => '_from_meta_file',
+  json => '_from_meta_file',
 );
 
 sub from_file {
@@ -243,10 +245,10 @@ sub from_file {
   $self->$method($filename);
 }
 
-sub _from_yaml_file {
+sub _from_meta_file {
   my ($self, $filename) = @_;
 
-  my $data = YAML::Syck::LoadFile($filename);
+  my $data = Parse::CPAN::Meta->load_file($filename);
   my $extra = (delete $data->{X_Module_Faker}) || {};
   my $dist = $self->new({ %$data, %$extra });
 }

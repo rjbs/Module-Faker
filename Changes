@@ -1,5 +1,10 @@
 Revision history for Module-Faker
 
+{{$NEXT}}
+          "Faker" key in meta files is now "X_Module_Faker"
+
+          build fake dists from .json files, too
+
 0.006     2008-04-08
           if source meta has "requires" put them in PREREQ_PM in Makefile.PL
             (thanks, HDP, for bugfix)
