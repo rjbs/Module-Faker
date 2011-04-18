@@ -1,6 +1,8 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+
+0.008     2011-04-18 11:02:50 Europe/Amsterdam
           .dist files can be used to populate entirely from distnameinfo
 
 0.007     2011-04-16 18:02:12 Europe/Amsterdam
