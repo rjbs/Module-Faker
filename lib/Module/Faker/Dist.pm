@@ -31,10 +31,14 @@ has archive_basename => (
 );
 
 has authors => (
-  is  => 'ro',
-  isa => 'ArrayRef[Str]',
-  auto_deref => 1,
-  default    => sub { [ 'Local Author <local@cpan.local>' ] },
+  isa  => 'ArrayRef[Str]',
+  lazy => 1,
+  traits  => [ 'Array' ],
+  handles => { authors => 'elements' },
+  default => sub {
+    my ($self) = @_;
+    return [ sprintf '%s <%s@cpan.local>', ($self->cpan_author) x 2 ];
+  },
 );
 
 sub __dist_to_pkg { my $str = shift; $str =~ s/-/::/g; return $str; }
