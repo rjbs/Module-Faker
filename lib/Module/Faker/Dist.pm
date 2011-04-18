@@ -8,10 +8,11 @@ use Module::Faker::Package;
 use Module::Faker::Module;
 
 use Archive::Any::Create;
+use CPAN::DistnameInfo;
 use File::Temp ();
 use File::Path ();
 use Parse::CPAN::Meta 1.4401;
-use YAML::Syck ();
+use Path::Class;
 
 has name         => (is => 'ro', isa => 'Str', required => 1);
 has version      => (is => 'ro', isa => 'Maybe[Str]', default => '0.01');
@@ -232,6 +233,7 @@ my %HANDLER_FOR = (
   yaml => '_from_meta_file',
   yml  => '_from_meta_file',
   json => '_from_meta_file',
+  dist => '_from_distnameinfo'
 );
 
 sub from_file {
@@ -243,6 +245,24 @@ sub from_file {
     unless $ext and my $method = $HANDLER_FOR{$ext};
 
   $self->$method($filename);
+}
+
+sub _from_distnameinfo {
+  my ($self, $filename) = @_;
+  $filename = file($filename)->basename;
+  $filename =~ s/\.dist$//;
+
+  my ($author, $path) = split /_/, $filename, 2;
+
+  my $dni = CPAN::DistnameInfo->new($path);
+
+  return $self->new({
+    name     => $dni->dist,
+    version  => $dni->version,
+    abstract => sprintf('the %s dist', $dni->dist),
+    archive_ext => $dni->extension,
+    cpan_author => $author,
+  });
 }
 
 sub _from_meta_file {

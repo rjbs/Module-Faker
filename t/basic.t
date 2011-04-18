@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use Module::Faker;
 use File::Temp ();
@@ -20,5 +20,17 @@ ok(
   "we got the mostly-auto dist",
 );
 
-my $dist = Module::Faker::Dist->from_file('./eg/RJBS-Dist.yml');
-is($dist->cpan_author, 'RJBS', "get cpan author from Faker section");
+subtest "from YAML file" => sub {
+  my $dist = Module::Faker::Dist->from_file('./eg/RJBS-Dist.yml');
+  is($dist->cpan_author, 'RJBS', "get cpan author from Faker META section");
+};
+
+subtest "from .dist file" => sub {
+  my $dist = Module::Faker::Dist->from_file('./eg/RJBS_Another-Dist-1.24.tar.gz.dist');
+  is($dist->cpan_author, 'RJBS', "get cpan author from .dist filename");
+
+  is($dist->name, 'Another-Dist', "correct dist name");
+  is($dist->version, '1.24', "correct version");
+};
+
+done_testing;
