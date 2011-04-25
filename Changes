@@ -2,6 +2,10 @@ Revision history for Module-Faker
 
 {{$NEXT}}
 
+0.009     2011-04-25 10:57:47 America/New_York
+          allow content to be appended to arbitrary files (thanks, Moritz
+          Onken!)
+
 0.008     2011-04-18 11:02:50 Europe/Amsterdam
           .dist files can be used to populate entirely from distnameinfo
 
