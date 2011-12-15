@@ -11,8 +11,10 @@ use Archive::Any::Create;
 use CPAN::DistnameInfo;
 use File::Temp ();
 use File::Path ();
+use CPAN::Meta::Converter 2.112621 ();
 use Parse::CPAN::Meta 1.4401;
 use Path::Class;
+use Try::Tiny 0.09;
 
 has name         => (is => 'ro', isa => 'Str', required => 1);
 has version      => (is => 'ro', isa => 'Maybe[Str]', default => '0.01');
@@ -291,6 +293,21 @@ sub _from_meta_file {
 
   my $data = Parse::CPAN::Meta->load_file($filename);
   my $extra = (delete $data->{X_Module_Faker}) || {};
+
+  # prior to 0.009 Module::Faker didn't validate meta input, so don't require it
+  try {
+    # Heavy.pm specifies 1.3 and this module expects 'requires' as an attribute
+    my $version = 1.3;
+    if( $data->{'meta-spec'} && $data->{'meta-spec'}->{version} >= $version ){
+      # validation fails without dist version
+      $data->{version} ||= 0;
+      $data = CPAN::Meta::Converter->new($data)->convert(version => $version);
+    }
+  }
+  catch {
+    warn $_[0];
+  };
+
   my $dist = $self->new({ %$data, %$extra });
 }
 
