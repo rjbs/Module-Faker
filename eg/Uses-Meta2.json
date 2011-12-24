@@ -1,0 +1,26 @@
+{
+  "name": "Uses-Meta2",
+  "abstract": "faked via meta-spec v2",
+  "version": 1.0,
+  "meta-spec": {
+    "version": 2,
+    "url": "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+  },
+  "no_index": {
+    "package": [ "Uses::Meta2::Secret" ]
+  },
+  "prereqs": {
+    "runtime": {
+      "requires": {
+        "Foo": 1
+      }
+    },
+    "configure": {
+      "requires": {
+        "Bar": 2.1
+      }
+    }
+  },
+  "X_Module_Faker": {
+  }
+}

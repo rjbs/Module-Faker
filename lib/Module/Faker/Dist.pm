@@ -11,8 +11,11 @@ use Archive::Any::Create;
 use CPAN::DistnameInfo;
 use File::Temp ();
 use File::Path ();
+use CPAN::Meta 2.112621 ();
+use CPAN::Meta::Converter 2.112621 ();
 use Parse::CPAN::Meta 1.4401;
 use Path::Class;
+use Try::Tiny 0.09;
 
 has name         => (is => 'ro', isa => 'Str', required => 1);
 has version      => (is => 'ro', isa => 'Maybe[Str]', default => '0.01');
@@ -20,6 +23,7 @@ has abstract     => (is => 'ro', isa => 'Str', default => 'a great new dist');
 has cpan_author  => (is => 'ro', isa => 'Maybe[Str]', default => 'LOCAL');
 has archive_ext  => (is => 'ro', isa => 'Str', default => 'tar.gz');
 has append       => (is => 'ro', isa => 'ArrayRef[HashRef]', default => sub {[]});
+has cpan_meta    => (is => 'ro', isa => 'CPAN::Meta', predicate => 'has_cpan_meta');
 
 sub append_for {
   my ($self, $filename) = @_;
@@ -234,7 +238,9 @@ has _extras => (
     my ($self) = @_;
     my @files;
 
-    for my $filename (qw(Makefile.PL META.yml t/00-nop.t)) {
+    for my $filename (qw(Makefile.PL META.yml META.json t/00-nop.t)) {
+      # won't generate a META.json without a CPAN::Meta object
+      next if $filename eq 'META.json' && !$self->has_cpan_meta;
       next if grep { $_ eq $filename } $self->omitted_files;
       push @files, $self->_file_class->new({
         filename => $filename,
@@ -291,6 +297,39 @@ sub _from_meta_file {
 
   my $data = Parse::CPAN::Meta->load_file($filename);
   my $extra = (delete $data->{X_Module_Faker}) || {};
+
+  # prior to 0.009 Module::Faker didn't validate meta input, so don't require it
+  try {
+    # Heavy.pm specifies 1.3 and this module expects 'requires' as an attribute
+    my $version = 1.3;
+
+    if( $data->{'meta-spec'} && $data->{'meta-spec'}->{version} >= $version ){
+      # validation fails without dist version
+      $data->{version} = 0
+        if !exists $data->{version};
+
+      # save another one for later (initialize with defaults)
+      # TODO: should we convert this to a specific version?
+      my $meta = CPAN::Meta->create({
+        author => $extra->{cpan_author} || 'unknown',
+        dynamic_config => 0,
+        license => 'unknown',
+        release_status => ($data->{version} =~ /_/ ? 'testing' : 'stable'),
+        generated_by => 'Module::Faker version ' . $self->VERSION,
+        %$data,
+      });
+
+      # downgrade file to spec $version to work with our attributes
+      $data = CPAN::Meta::Converter->new($data)->convert(version => $version);
+
+      # store the meta object to be able to produce full meta files
+      $data->{cpan_meta} = $meta;
+    }
+  }
+  catch {
+    warn $_[0];
+  };
+
   my $dist = $self->new({ %$data, %$extra });
 }
 
