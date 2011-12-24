@@ -319,7 +319,10 @@ sub _from_meta_file {
         %$data,
       });
 
+      # downgrade file to spec $version to work with our attributes
       $data = CPAN::Meta::Converter->new($data)->convert(version => $version);
+
+      # store the meta object to be able to produce full meta files
       $data->{cpan_meta} = $meta;
     }
   }
