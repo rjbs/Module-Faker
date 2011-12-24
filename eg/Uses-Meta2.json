@@ -6,10 +6,18 @@
     "version": 2,
     "url": "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
   },
+  "no_index": {
+    "package": [ "Uses::Meta2::Secret" ]
+  },
   "prereqs": {
     "runtime": {
       "requires": {
         "Foo": 1
+      }
+    },
+    "configure": {
+      "requires": {
+        "Bar": 2.1
       }
     }
   },
