@@ -46,6 +46,8 @@ sub _render {
 1;
 
 __DATA__
+__META.json__
+{{ $dist->cpan_meta->as_string({version => 2}) }}
 __META.yml__
 ---
 name: {{ $dist->name }}
