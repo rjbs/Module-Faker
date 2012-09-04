@@ -1,6 +1,8 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+
+0.010     2012-09-03 21:38:01 America/New_York
           encode append content to UTF-8 before appending it (thanks, Randy
           Stauner!)
 
