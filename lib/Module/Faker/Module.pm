@@ -1,6 +1,7 @@
 package Module::Faker::Module;
 use Moose;
 with 'Module::Faker::Appendix';
+# ABSTRACT: a faked module
 
 use Module::Faker::Package;
 

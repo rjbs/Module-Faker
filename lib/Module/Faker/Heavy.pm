@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 package Module::Faker::Heavy;
+# ABSTRACT: where the fake sausage gets made
 
 use Carp ();
 use Text::Template;

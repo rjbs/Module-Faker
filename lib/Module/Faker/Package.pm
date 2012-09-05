@@ -1,5 +1,6 @@
 package Module::Faker::Package;
 use Moose;
+# ABSTRACT: a faked package in a faked module
 
 use Moose::Util::TypeConstraints;
 
