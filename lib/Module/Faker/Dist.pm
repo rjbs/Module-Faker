@@ -22,6 +22,7 @@ has abstract     => (is => 'ro', isa => 'Str', default => 'a great new dist');
 has cpan_author  => (is => 'ro', isa => 'Maybe[Str]', default => 'LOCAL');
 has archive_ext  => (is => 'ro', isa => 'Str', default => 'tar.gz');
 has append       => (is => 'ro', isa => 'ArrayRef[HashRef]', default => sub {[]});
+has mtime        => (is => 'ro', isa => 'Int', predicate => 'has_mtime');
 
 sub append_for {
   my ($self, $filename) = @_;
@@ -179,7 +180,7 @@ sub make_archive {
 
   $self->_mk_container_path($archive_filename);
   $archive->write_file($archive_filename);
-
+  utime time, $self->mtime, $archive_filename if $self->has_mtime;
   return $archive_filename;
 }
 
