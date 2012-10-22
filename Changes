@@ -2,6 +2,9 @@ Revision history for Module-Faker
 
 {{$NEXT}}
 
+0.012     2012-10-22 17:38:27 America/New_York
+          allow the mtime to be set via extra info (thanks, Moritz Onken!)
+
 0.011     2012-09-05 09:11:21 America/New_York
           add a VERSION to ::Module, add abstracts
 
