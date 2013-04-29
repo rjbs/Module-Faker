@@ -36,4 +36,11 @@ subtest "from .dist file" => sub {
   is($dist->version, '1.24', "correct version");
 };
 
+subtest "from struct, with undef version" => sub {
+  my $dist = Module::Faker::Dist->new({name => 'Some-Dist', version => undef});
+  is($dist->name, 'Some-Dist', "correct dist name");
+  is($dist->version, undef, "correct version");
+  is($dist->archive_basename, 'Some-Dist-undef', "correct basename");
+};
+
 done_testing;

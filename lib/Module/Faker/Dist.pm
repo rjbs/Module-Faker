@@ -1,6 +1,6 @@
 package Module::Faker::Dist;
 use Moose;
-use 5.10.0;
+
 # ABSTRACT: a fake CPAN distribution
 
 use Module::Faker::File;
@@ -24,6 +24,8 @@ has archive_ext  => (is => 'ro', isa => 'Str', default => 'tar.gz');
 has append       => (is => 'ro', isa => 'ArrayRef[HashRef]', default => sub {[]});
 has mtime        => (is => 'ro', isa => 'Int', predicate => 'has_mtime');
 
+sub __dor { defined $_[0] ? $_[0] : $_[1] }
+
 sub append_for {
   my ($self, $filename) = @_;
   return [
@@ -40,7 +42,7 @@ has archive_basename => (
   lazy => 1,
   default => sub {
     my ($self) = @_;
-    return sprintf '%s-%s', $self->name, $self->version // 'undef';
+    return sprintf '%s-%s', $self->name, __dor($self->version, 'undef');
   },
 );
 
