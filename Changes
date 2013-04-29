@@ -1,6 +1,8 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+          drop // use to continue to support 5.8.8 (thank Jeffrey Ryan
+          Thalhammer for this one!)
 
 0.012     2012-10-22 17:38:27 America/New_York
           allow the mtime to be set via extra info (thanks, Moritz Onken!)
