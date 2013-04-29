@@ -2,6 +2,9 @@ Revision history for Module-Faker
 
 {{$NEXT}}
 
+0.014     2013-04-29 08:00:05 America/New_York
+          like 0.013, but with the promised change!
+
 0.013     2013-04-29 07:58:54 America/New_York
           drop // use to continue to support 5.8.8 (thank Jeffrey Ryan
           Thalhammer for this one!)
