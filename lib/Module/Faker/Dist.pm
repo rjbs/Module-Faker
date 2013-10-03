@@ -221,32 +221,28 @@ has omitted_files => (
   auto_deref => 1,
 );
 
-# old v1 style; should use 'prereqs' instead
-has requires => (
-  is   => 'ro',
-  isa  => 'HashRef',
-  lazy => 1,
-  default    => sub { {} },
-  auto_deref => 1,
-);
+around BUILDARGS => sub {
+  my ($orig, $self, @rest) = @_;
+  my $arg = $self->$orig(@rest);
 
-# upgrade from 'requires' if necessary
+  confess "can't supply both requires and prereqs"
+    if $arg->{prereqs} && $arg->{requires};
+
+  if ($arg->{requires}) {
+    $arg->{prereqs} = {
+      runtime => { requires => delete $arg->{requires} }
+    };
+  }
+
+  return $arg;
+};
+
 has prereqs => (
   is   => 'ro',
   isa  => 'HashRef',
-  lazy_build => 1,
+  default    => sub {  {}  },
   auto_deref => 1,
 );
-
-sub _build_prereqs {
-  my ($self) = @_;
-  if ( keys %{$self->requires} ) {
-    return { runtime => { requires => { $self->requires } } };
-  }
-  else {
-    return {}
-  }
-}
 
 has _manifest_file => (
   is   => 'ro',
