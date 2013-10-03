@@ -47,6 +47,24 @@ has authors => (
   },
 );
 
+# optional CPAN::Meta::Spec fields
+has provides => (
+  is => 'ro',
+  isa => 'HashRef',
+  lazy_build => 1,
+);
+
+sub _build_provides {
+  my ($self) = @_;
+  my $pkg = __dist_to_pkg($self->name);
+  return {
+    $pkg => {
+      version => $self->version,
+      file => __pkg_to_file($pkg),
+    }
+  };
+};
+
 sub __dor { defined $_[0] ? $_[0] : $_[1] }
 
 sub append_for {
@@ -81,31 +99,45 @@ sub _pkgy_name {
   return $name;
 }
 
-has provides => (
-  is     => 'ro',
-  isa    => 'Module::Faker::Type::Packages',
-  lazy   => 1,
-  coerce => 1,
-  required   => 1,
-  default    => sub {
-    my ($self) = @_;
-    my $pkg = __dist_to_pkg($self->name);
-    return [
-      Module::Faker::Package->new({
-        name    => $pkg,
-        version => $self->version,
-        in_file => __pkg_to_file($pkg),
-      })
-    ]
-  },
+has packages => (
+  is          => 'ro',
+  isa         => 'Module::Faker::Type::Packages',
+  lazy_build  => 1,
   auto_deref => 1,
 );
+
+sub _build_packages {
+  my ($self) = @_;
+
+  my $href = $self->provides;
+
+  # do this dance so we don't autovivify X_Module_Faker in provides
+  my %package_order = map {;
+    $_ => (exists $href->{$_}{X_Module_Faker} ? $href->{$_}{X_Module_Faker}{order} : 0 )
+  } keys %$href;
+
+  my @pkg_names = do {
+    no warnings 'uninitialized';
+    sort { $package_order{$a} <=> $package_order{$b} } keys %package_order;
+  };
+
+  my @packages;
+  for my $name (@pkg_names) {
+    push @packages, Module::Faker::Package->new({
+      name    => $name,
+      version => $href->{$name}{version},
+      in_file => $href->{$name}{file},
+    });
+  }
+
+  return \@packages;
+}
 
 sub modules {
   my ($self) = @_;
 
   my %module;
-  for my $pkg ($self->provides) {
+  for my $pkg ($self->packages) {
     my $filename = $pkg->in_file;
 
     push @{ $module{ $filename } ||= [] }, $pkg;
