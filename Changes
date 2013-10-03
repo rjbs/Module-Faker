@@ -1,6 +1,7 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+          Adds META.json and CPAN::META::Spec v2 support
 
 0.014     2013-04-29 08:00:05 America/New_York
           like 0.013, but with the promised change!

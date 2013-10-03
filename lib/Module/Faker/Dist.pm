@@ -10,19 +10,60 @@ use Module::Faker::Module;
 
 use Archive::Any::Create;
 use CPAN::DistnameInfo;
+use CPAN::Meta;
+use CPAN::Meta::Requirements;
 use File::Temp ();
 use File::Path ();
 use Parse::CPAN::Meta 1.4401;
 use Path::Class;
 use Encode qw( encode_utf8 );
 
-has name         => (is => 'ro', isa => 'Str', required => 1);
-has version      => (is => 'ro', isa => 'Maybe[Str]', default => '0.01');
-has abstract     => (is => 'ro', isa => 'Str', default => 'a great new dist');
+# Module::Faker options
 has cpan_author  => (is => 'ro', isa => 'Maybe[Str]', default => 'LOCAL');
 has archive_ext  => (is => 'ro', isa => 'Str', default => 'tar.gz');
 has append       => (is => 'ro', isa => 'ArrayRef[HashRef]', default => sub {[]});
 has mtime        => (is => 'ro', isa => 'Int', predicate => 'has_mtime');
+
+# required by CPAN::Meta::Spec
+has name           => (is => 'ro', isa => 'Str', required => 1);
+has version        => (is => 'ro', isa => 'Maybe[Str]', default => '0.01');
+has abstract       => (is => 'ro', isa => 'Str', default => 'a great new dist');
+has release_status => (is => 'ro', isa => 'Str', default => 'stable');
+
+has license => (
+  is      => 'ro',
+  isa     => 'ArrayRef[Str]',
+  default => sub { [ 'perl_5' ] },
+);
+
+has authors => (
+  isa  => 'ArrayRef[Str]',
+  lazy => 1,
+  traits  => [ 'Array' ],
+  handles => { authors => 'elements' },
+  default => sub {
+    my ($self) = @_;
+    return [ sprintf '%s <%s@cpan.local>', ($self->cpan_author) x 2 ];
+  },
+);
+
+# optional CPAN::Meta::Spec fields
+has provides => (
+  is => 'ro',
+  isa => 'HashRef',
+  lazy_build => 1,
+);
+
+sub _build_provides {
+  my ($self) = @_;
+  my $pkg = __dist_to_pkg($self->name);
+  return {
+    $pkg => {
+      version => $self->version,
+      file => __pkg_to_file($pkg),
+    }
+  };
+};
 
 sub __dor { defined $_[0] ? $_[0] : $_[1] }
 
@@ -46,17 +87,6 @@ has archive_basename => (
   },
 );
 
-has authors => (
-  isa  => 'ArrayRef[Str]',
-  lazy => 1,
-  traits  => [ 'Array' ],
-  handles => { authors => 'elements' },
-  default => sub {
-    my ($self) = @_;
-    return [ sprintf '%s <%s@cpan.local>', ($self->cpan_author) x 2 ];
-  },
-);
-
 sub __dist_to_pkg { my $str = shift; $str =~ s/-/::/g; return $str; }
 sub __pkg_to_file { my $str = shift; $str =~ s{::}{/}g; return "lib/$str.pm"; }
 
@@ -69,31 +99,45 @@ sub _pkgy_name {
   return $name;
 }
 
-has provides => (
-  is     => 'ro',
-  isa    => 'Module::Faker::Type::Packages',
-  lazy   => 1,
-  coerce => 1,
-  required   => 1,
-  default    => sub {
-    my ($self) = @_;
-    my $pkg = __dist_to_pkg($self->name);
-    return [
-      Module::Faker::Package->new({
-        name    => $pkg,
-        version => $self->version,
-        in_file => __pkg_to_file($pkg),
-      })
-    ]
-  },
+has packages => (
+  is          => 'ro',
+  isa         => 'Module::Faker::Type::Packages',
+  lazy_build  => 1,
   auto_deref => 1,
 );
+
+sub _build_packages {
+  my ($self) = @_;
+
+  my $href = $self->provides;
+
+  # do this dance so we don't autovivify X_Module_Faker in provides
+  my %package_order = map {;
+    $_ => (exists $href->{$_}{X_Module_Faker} ? $href->{$_}{X_Module_Faker}{order} : 0 )
+  } keys %$href;
+
+  my @pkg_names = do {
+    no warnings 'uninitialized';
+    sort { $package_order{$a} <=> $package_order{$b} } keys %package_order;
+  };
+
+  my @packages;
+  for my $name (@pkg_names) {
+    push @packages, Module::Faker::Package->new({
+      name    => $name,
+      version => $href->{$name}{version},
+      in_file => $href->{$name}{file},
+    });
+  }
+
+  return \@packages;
+}
 
 sub modules {
   my ($self) = @_;
 
   my %module;
-  for my $pkg ($self->provides) {
+  for my $pkg ($self->packages) {
     my $filename = $pkg->in_file;
 
     push @{ $module{ $filename } ||= [] }, $pkg;
@@ -209,11 +253,26 @@ has omitted_files => (
   auto_deref => 1,
 );
 
-has requires => (
+around BUILDARGS => sub {
+  my ($orig, $self, @rest) = @_;
+  my $arg = $self->$orig(@rest);
+
+  confess "can't supply both requires and prereqs"
+    if $arg->{prereqs} && $arg->{requires};
+
+  if ($arg->{requires}) {
+    $arg->{prereqs} = {
+      runtime => { requires => delete $arg->{requires} }
+    };
+  }
+
+  return $arg;
+};
+
+has prereqs => (
   is   => 'ro',
   isa  => 'HashRef',
-  lazy => 1,
-  default    => sub { {} },
+  default    => sub {  {}  },
   auto_deref => 1,
 );
 
@@ -235,6 +294,30 @@ has _manifest_file => (
   },
 );
 
+has _cpan_meta => (
+  is => 'ro',
+  isa => 'CPAN::Meta',
+  lazy_build => 1,
+);
+
+sub _build__cpan_meta {
+  my ($self) = @_;
+  my $meta = {
+    'meta-spec' => { version => '2' },
+    dynamic_config => 0,
+    author => [ $self->authors ], # plural attribute that derefs
+  };
+  # required fields
+  for my $key ( qw/abstract license name release_status version/ ) {
+    $meta->{$key} = $self->$key;
+  }
+  # optional fields
+  for my $key ( qw/provides prereqs/ ) {
+    $meta->{$key} = $self->$key;
+  }
+  return CPAN::Meta->new( $meta, {lazy_validation => 1} );
+}
+
 has _extras => (
   is   => 'ro',
   isa  => 'ArrayRef[Module::Faker::File]',
@@ -244,7 +327,7 @@ has _extras => (
     my ($self) = @_;
     my @files;
 
-    for my $filename (qw(Makefile.PL META.yml t/00-nop.t)) {
+    for my $filename (qw(Makefile.PL t/00-nop.t)) {
       next if grep { $_ eq $filename } $self->omitted_files;
       push @files, $self->_file_class->new({
         filename => $filename,
@@ -252,6 +335,20 @@ has _extras => (
           $filename,
           { dist => $self },
         ),
+      });
+    }
+
+    unless ( grep { $_ eq 'META.json' } $self->omitted_files ) {
+      push @files, $self->_file_class->new({
+        filename => 'META.json',
+        content  => $self->_cpan_meta->as_string( { version => "2" } ),
+      });
+    }
+
+    unless ( grep { $_ eq 'META.yml' } $self->omitted_files ) {
+      push @files, $self->_file_class->new({
+        filename => 'META.yml',
+        content  => $self->_cpan_meta->as_string( { version => "1.4" } ),
       });
     }
 
@@ -304,4 +401,16 @@ sub _from_meta_file {
   my $dist = $self->new({ %$data, %$extra });
 }
 
+sub _flat_prereqs {
+  my ($self) = @_;
+  my $prereqs = $self->_cpan_meta->effective_prereqs;
+  my $req = CPAN::Meta::Requirements->new;
+  for my $phase ( qw/runtime build test/ ) {
+    $req->add_requirements( $prereqs->requirements_for( $phase, 'requires' ) );
+  }
+  return %{ $req->as_string_hash };
+}
+
 1;
+
+# vim: ts=2 sts=2 sw=2 et:

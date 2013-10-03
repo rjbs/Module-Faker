@@ -74,9 +74,9 @@ WriteMakefile(
   VERSION  => "{{ $dist->version }}",
   ABSTRACT => '{{ my $abs = $dist->abstract; $abs =~ s/'/\'/g; $abs }}',
   PREREQ_PM => { {{
-if (my %requires = $dist->requires) {
+if (my %requires = $dist->_flat_prereqs ) {
   $OUT .= sprintf "\n    '%s' => '%s',", $_,
-    (defined $requires{$_} ?  $requires{$_} : 0) for keys %requires;
+    (defined $requires{$_} ?  $requires{$_} : 0) for sort keys %requires;
 }
 return;
   }}
