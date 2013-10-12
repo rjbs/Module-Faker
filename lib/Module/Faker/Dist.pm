@@ -61,7 +61,7 @@ sub __dist_to_pkg { my $str = shift; $str =~ s/-/::/g; return $str; }
 sub __pkg_to_file { my $str = shift; $str =~ s{::}{/}g; return "lib/$str.pm"; }
 
 # This is stupid, but copes with MakeMaker wanting to have a module name as its
-# NAME paramter.  Ugh! -- rjbs, 2008-03-13
+# NAME parameter.  Ugh! -- rjbs, 2008-03-13
 sub _pkgy_name {
   my $name = shift->name;
   $name =~ s/-/::/;
