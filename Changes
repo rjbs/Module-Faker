@@ -1,7 +1,10 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
-          Adds META.json and CPAN::META::Spec v2 support
+          [THIS MIGHT BREAK YOUR CODE]
+        - Adds META.json and CPAN::META::Spec v2 support (thanks, David
+          Golden!)  If you were using ->provides to get objects, you should now
+          use ->packages instead.
 
 0.014     2013-04-29 08:00:05 America/New_York
           like 0.013, but with the promised change!
