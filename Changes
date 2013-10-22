@@ -1,6 +1,8 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+
+0.015     2013-10-22 18:53:18 America/New_York
           [THIS MIGHT BREAK YOUR CODE]
         - Adds META.json and CPAN::META::Spec v2 support (thanks, David
           Golden!)  If you were using ->provides to get objects, you should now
