@@ -1,6 +1,7 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+        - require a newer CPAN::Meta
 
 0.015     2013-10-22 18:53:18 America/New_York
           [THIS MIGHT BREAK YOUR CODE]

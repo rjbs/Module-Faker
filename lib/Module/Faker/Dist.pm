@@ -10,7 +10,7 @@ use Module::Faker::Module;
 
 use Archive::Any::Create;
 use CPAN::DistnameInfo;
-use CPAN::Meta;
+use CPAN::Meta 2.130880; # github issue #9
 use CPAN::Meta::Requirements;
 use File::Temp ();
 use File::Path ();
