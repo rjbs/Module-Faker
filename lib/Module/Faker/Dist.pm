@@ -94,7 +94,7 @@ sub __pkg_to_file { my $str = shift; $str =~ s{::}{/}g; return "lib/$str.pm"; }
 # NAME parameter.  Ugh! -- rjbs, 2008-03-13
 sub _pkgy_name {
   my $name = shift->name;
-  $name =~ s/-/::/;
+  $name =~ s/-/::/g;
 
   return $name;
 }
