@@ -1,6 +1,7 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+        - fix a bug with dist-to-pkg name conversion (thanks, Randy Stauner)
 
 0.016     2013-11-05 22:13:08 America/New_York
         - require a newer CPAN::Meta
