@@ -1,7 +1,8 @@
 package Module::Faker::Module;
+# ABSTRACT: a faked module
+
 use Moose;
 with 'Module::Faker::Appendix';
-# ABSTRACT: a faked module
 
 use Module::Faker::Package;
 

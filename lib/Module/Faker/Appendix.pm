@@ -1,6 +1,7 @@
 package Module::Faker::Appendix;
-use Moose::Role;
 # ABSTRACT: a thing that appends
+
+use Moose::Role;
 
 has append => (
   is => 'ro',

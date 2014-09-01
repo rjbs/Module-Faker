@@ -1,7 +1,8 @@
 package Module::Faker::Dist;
+# ABSTRACT: a fake CPAN distribution
+
 use Moose;
 
-# ABSTRACT: a fake CPAN distribution
 
 use Module::Faker::File;
 use Module::Faker::Heavy;

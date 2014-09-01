@@ -1,7 +1,8 @@
 package Module::Faker;
+# ABSTRACT: build fake dists for testing CPAN tools
+
 use 5.008;
 use Moose 0.33;
-# ABSTRACT: build fake dists for testing CPAN tools
 
 use Module::Faker::Dist;
 
