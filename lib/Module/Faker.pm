@@ -43,6 +43,55 @@ methods of the same name.  Valid arguments are:
 
   dist_class - the class used to fake dists; default: Module::Faker::Dist
 
+The source files are essentially CPAN::Meta files with some optional extra
+features.  All the you really require are the name and abstract.  Other 
+bits like requirements can be specified and will be passed through.  Out of
+the box the module will create the main module file based on the module name
+and a single test file.  You can either use the provides section of the 
+CPAN::META file or to specify their contents use the X_Module_Faker
+append section.
+
+The X_Module_Faker also allows you to alter the cpan_author from the
+default 'LOCAL <LOCAL@cpan.local>' which overrides whatever is in the
+usual CPAN::Meta file.
+
+Here is an example yaml specification from the tests,
+
+    name: Append
+    abstract: nothing to see here
+    provides:
+      Provides::Inner:
+        file: lib/Provides/Inner.pm
+        version: 0.001
+      Provides::Inner::Util:
+        file: lib/Provides/Inner.pm
+    X_Module_Faker:
+      cpan_author: SOMEONE
+      append:
+        - file: lib/Provides/Inner.pm
+          content: "\n=head1 NAME\n\nAppend - here I am"
+        - file: t/foo.t
+          content: |
+            use Test::More;
+        - file: t/foo.t
+          content: "ok(1);"
+
+If you need to sort the packages within a file you
+can use an X_Module_Faker:order parameter on the
+provides class.
+
+    provides:
+      Provides::Inner::Sorted::Charlie:
+        file: lib/Provides/Inner/Sorted.pm
+        version: 0.008
+        X_Module_Faker:
+          order: 2
+      Provides::Inner::Sorted::Alfa:
+        file: lib/Provides/Inner/Sorted.pm
+        version: 0.001
+        X_Module_Faker:
+          order: 1
+
 =cut
 
 has source => (is => 'ro', required => 1);
