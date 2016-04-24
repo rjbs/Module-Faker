@@ -31,6 +31,8 @@ has version        => (is => 'ro', isa => 'Maybe[Str]', default => '0.01');
 has abstract       => (is => 'ro', isa => 'Str', default => 'a great new dist');
 has release_status => (is => 'ro', isa => 'Str', default => 'stable');
 
+has x_authority => (is => 'ro', isa => 'Str');
+
 has license => (
   is      => 'ro',
   isa     => 'ArrayRef[Str]',
@@ -313,7 +315,7 @@ sub _build__cpan_meta {
     $meta->{$key} = $self->$key;
   }
   # optional fields
-  for my $key ( qw/provides prereqs/ ) {
+  for my $key ( qw/provides prereqs x_authority/ ) {
     $meta->{$key} = $self->$key;
   }
   return CPAN::Meta->new( $meta, {lazy_validation => 1} );
