@@ -1,6 +1,7 @@
 #!perl
 use v5.20.0;
 use warnings;
+# PODNAME: module-faker
 
 use Getopt::Long::Descriptive;
 use Module::Faker;
