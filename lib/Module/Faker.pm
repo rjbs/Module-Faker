@@ -43,12 +43,12 @@ methods of the same name.  Valid arguments are:
 
   dist_class - the class used to fake dists; default: Module::Faker::Dist
 
-The source files are essentially a subset of CPAN::Meta files with some 
+The source files are essentially a subset of CPAN::Meta files with some
 optional extra features.  All the you really require are the name and
 abstract.  Other bits like requirements can be specified and will be passed
 through.  Out of the box the module will create the main module file based
 on the module name and a single test file.  You can either use the provides
-section of the CPAN::META file or to specify their contents use the 
+section of the CPAN::META file or to specify their contents use the
 X_Module_Faker append section.
 
 The X_Module_Faker also allows you to alter the cpan_author from the
