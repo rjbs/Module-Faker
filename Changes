@@ -1,6 +1,7 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+        - lower version required to v5.14, for PAUSE
 
 0.018     2018-04-22 12:02:52+02:00 Europe/Oslo
         - add a new tool, module-faker
