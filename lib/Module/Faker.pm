@@ -118,6 +118,7 @@ The supported keys from CPAN::Meta are,
 
 has source => (is => 'ro', required => 1);
 has dest   => (is => 'ro', required => 1);
+has author_prefix => (is => 'ro', default => 0);
 
 has dist_class => (
   is  => 'ro',
@@ -148,7 +149,10 @@ sub make_fakes {
 
   while (my $file = $iter->()) {
     my $dist = $self->dist_class->from_file($file);
-    $dist->make_archive({ dir => $self->dest });
+    $dist->make_archive({
+      dir => $self->dest,
+      author_prefix => $self->author_prefix,
+    });
   }
 }
 
