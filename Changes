@@ -1,6 +1,8 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+        - add a new tool, module-faker
+        - allow source directory to be a single file instead
 
 0.017     2014-09-01 08:57:25-04:00 America/New_York
         - fix a bug with dist-to-pkg name conversion (thanks, Randy Stauner)
