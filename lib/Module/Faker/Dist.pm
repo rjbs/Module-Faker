@@ -316,7 +316,8 @@ sub _build__cpan_meta {
   }
   # optional fields
   for my $key ( qw/provides prereqs x_authority/ ) {
-    $meta->{$key} = $self->$key;
+    my $value = $self->$key;
+    $meta->{$key} = $value if $value;
   }
   return CPAN::Meta->new( $meta, {lazy_validation => 1} );
 }
