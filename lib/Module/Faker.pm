@@ -11,7 +11,7 @@ use File::Next ();
 =head1 SYNOPSIS
 
   Module::Faker->make_fakes({
-    source => './dir-of-specs',
+    source => './dir-of-specs', # ...or a single file
     dest   => './will-contain-tarballs',
   });
 
@@ -133,7 +133,6 @@ sub BUILD {
   for (qw(source dest)) {
     my $dir = $self->$_;
     Carp::croak "$_ directory does not exist"     unless -e $dir;
-    Carp::croak "$_ directory is not a directory" unless -d $dir;
     Carp::croak "$_ directory is not readable"    unless -r $dir;
   }
 
