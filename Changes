@@ -1,6 +1,8 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+
+0.020     2018-04-22 21:59:37+02:00 Europe/Oslo
         - x_authority, provides, and prereqs will no longer be present in the
           META for built dists unless they're defined
 
