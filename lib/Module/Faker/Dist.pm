@@ -3,7 +3,6 @@ package Module::Faker::Dist;
 
 use Moose;
 
-
 use Module::Faker::File;
 use Module::Faker::Heavy;
 use Module::Faker::Package;
