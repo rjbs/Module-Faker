@@ -8,9 +8,9 @@ use Module::Faker;
 
 my ($opt, $desc) = describe_options(
   '%c %o',
-  [ 'src|s=s',      "source directory",                 { required => 1 } ],
-  [ 'dest|d=s',     "destination directory",            { required => 1 } ],
-  [ 'author-dir|p', "write dists into A/U/AUTHOR dirs", { required => 1 } ],
+  [ 'src|s=s',       "source directory",                 { required => 1 } ],
+  [ 'dest|d=s',      "destination directory",            { required => 1 } ],
+  [ 'author-dir|p!', "write dists into A/U/AUTHOR dirs", { default  => 0 } ],
 );
 
 Module::Faker->make_fakes({
