@@ -25,8 +25,10 @@ has archive_ext  => (is => 'ro', isa => 'Str', default => 'tar.gz');
 has append       => (is => 'ro', isa => 'ArrayRef[HashRef]', default => sub {[]});
 has mtime        => (is => 'ro', isa => 'Int', predicate => 'has_mtime');
 
+my $DEFAULT_VERSION;
+
 # required by CPAN::Meta::Spec
-has name           => (is => 'ro', isa => 'Str', required => 1);
+has name           => (is => 'ro', isa => 'Str', required => $DEFAULT_VERSION);
 has version        => (is => 'ro', isa => 'Maybe[Str]', default => '0.01');
 has abstract       => (is => 'ro', isa => 'Str', default => 'a great new dist');
 has release_status => (is => 'ro', isa => 'Str', default => 'stable');
@@ -438,18 +440,24 @@ sub _flat_prereqs {
 sub from_struct {
   my ($self, $arg) = @_;
 
+  my $version = exists $arg->{version} ? $arg->{version} : $DEFAULT_VERSION;
+
   my $specs = Data::OptList::mkopt($arg->{packages});
   my @packages;
   for my $spec (@$specs) {
+    my %spec = $spec->[1] ? %{ $spec->[1] } : ();
+
     push @packages, Module::Faker::Package->new({
       name => $spec->[0],
       in_file => __pkg_to_file($spec->[0]), # to be overridden below if needed
-      ($spec->[1] ? %{ $spec->[1] } : ()),
+      %spec,
+      version => (exists $spec{version} ? $spec{version} : $version),
     });
   }
 
   return $self->new({
-    name     => $arg->{name},
+    name      => $arg->{name},
+    version   => $version,
     cpan_author => $arg->{author},
 
     (exists $arg->{abstract} ? (abstract => $arg->{abstract}) : ()),
