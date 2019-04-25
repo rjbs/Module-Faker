@@ -112,10 +112,12 @@ sub _pkgy_name {
 }
 
 has packages => (
-  is          => 'ro',
-  isa         => 'Module::Faker::Type::Packages',
-  lazy_build  => 1,
-  auto_deref => 1,
+  isa     => 'Module::Faker::Type::Packages',
+  lazy    => 1,
+  builder => '_build_packages',
+  traits  => [ 'Array' ],
+  handles => { packages => 'elements' },
+  predicate => 'has_packages',
 );
 
 sub _build_packages {
@@ -260,9 +262,11 @@ sub files {
 sub _file_class { 'Module::Faker::File' }
 
 has omitted_files => (
-  is   => 'ro',
   isa  => 'ArrayRef[Str]',
-  auto_deref => 1,
+  traits  => [ 'Array' ],
+  handles => { omitted_files => 'elements' },
+  lazy    => 1,
+  default => sub { [] },
 );
 
 around BUILDARGS => sub {
@@ -284,8 +288,7 @@ around BUILDARGS => sub {
 has prereqs => (
   is   => 'ro',
   isa  => 'HashRef',
-  default    => sub {  {}  },
-  auto_deref => 1,
+  default => sub {  {}  },
 );
 
 has _manifest_file => (
@@ -332,11 +335,11 @@ sub _build__cpan_meta {
 }
 
 has _extras => (
-  is   => 'ro',
   isa  => 'ArrayRef[Module::Faker::File]',
   lazy => 1,
-  auto_deref => 1,
-  default    => sub {
+  traits    => [ 'Array' ],
+  handles   => { _extras => 'elements' },
+  default   => sub {
     my ($self) = @_;
     my @files;
 
