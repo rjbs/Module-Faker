@@ -58,6 +58,16 @@ has provides => (
 
 sub _build_provides {
   my ($self) = @_;
+
+  if ($self->has_packages) {
+    return {
+      map {; $_->name => {
+        file    => $_->in_file,
+        (defined $_->version ? (version => $_->version) : ()),
+      } } $self->packages
+    }
+  }
+
   my $pkg = __dist_to_pkg($self->name);
   return {
     $pkg => {
