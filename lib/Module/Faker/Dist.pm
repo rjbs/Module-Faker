@@ -285,6 +285,13 @@ around BUILDARGS => sub {
   return $arg;
 };
 
+sub BUILD {
+  my ($self) = @_;
+  my $provides = $self->provides;
+
+  $provides->{$_}{file} //= __pkg_to_file($_) for keys %$provides;
+}
+
 has prereqs => (
   is   => 'ro',
   isa  => 'HashRef',
