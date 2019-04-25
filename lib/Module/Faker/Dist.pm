@@ -12,6 +12,7 @@ use Archive::Any::Create;
 use CPAN::DistnameInfo;
 use CPAN::Meta 2.130880; # github issue #9
 use CPAN::Meta::Requirements;
+use Data::OptList ();
 use File::Temp ();
 use File::Path ();
 use Parse::CPAN::Meta 1.4401;
@@ -432,6 +433,30 @@ sub _flat_prereqs {
     $req->add_requirements( $prereqs->requirements_for( $phase, 'requires' ) );
   }
   return %{ $req->as_string_hash };
+}
+
+sub from_struct {
+  my ($self, $arg) = @_;
+
+  my $specs = Data::OptList::mkopt($arg->{packages});
+  my @packages;
+  for my $spec (@$specs) {
+    push @packages, Module::Faker::Package->new({
+      name => $spec->[0],
+      in_file => __pkg_to_file($spec->[0]), # to be overridden below if needed
+      ($spec->[1] ? %{ $spec->[1] } : ()),
+    });
+  }
+
+  return $self->new({
+    name     => $arg->{name},
+    cpan_author => $arg->{author},
+
+    (exists $arg->{abstract} ? (abstract => $arg->{abstract}) : ()),
+    (exists $arg->{version}  ? (version  => $arg->{version})  : ()),
+
+    packages  => \@packages,
+  });
 }
 
 1;
