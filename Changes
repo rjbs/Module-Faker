@@ -7,6 +7,9 @@ Revision history for Module-Faker
         - populate the "file" entry in provides by using the package name,
           when it's left blank in the dist source
         - replace use of auto_deref with Moose native traits
+        - Dist now has include_provides_in_meta, defaulting false, controlling
+          whether "provides" are put into META files.  It's false to help act
+          more like real life, where provides is very rare.
 
 0.020     2018-04-22 21:59:37+02:00 Europe/Oslo
         - x_authority, provides, and prereqs will no longer be present in the

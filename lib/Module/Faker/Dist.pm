@@ -55,7 +55,7 @@ has authors => (
 has include_provides_in_meta => (
   is  => 'ro',
   isa => 'Bool',
-  default => 1,
+  default => 0,
 );
 
 # optional CPAN::Meta::Spec fields

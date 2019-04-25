@@ -19,8 +19,29 @@ my $MFD = 'Module::Faker::Dist';
 
 my $tmpdir = File::Temp::tempdir(CLEANUP => 1);
 
+subtest "dist without meta provides" => sub {
+  my $dist = $MFD->from_file('./eg/Provides-Inner.yml');
+
+  isa_ok($dist, $MFD);
+
+  my $dir = $dist->make_dist_dir({ dir => $tmpdir });
+
+  for my $f ( @expected ) {
+    ok( -e "$dir/$f", "there's a $f");
+  }
+
+  my $content = file("$dir/META.json")->slurp;
+  my $meta = JSON::PP->new->decode( $content );
+
+  ok(
+    ! exists $meta->{provides},
+    "provides is absent"
+  ) or note explain($meta->{provides});
+};
+
 subtest "dist with meta provides" => sub {
   my $dist = $MFD->from_file('./eg/Provides-Inner.yml');
+  $dist->{include_provides_in_meta} = 1; # Violation! -- rjbs, 2019-04-25
 
   isa_ok($dist, $MFD);
 
@@ -49,25 +70,4 @@ subtest "dist with meta provides" => sub {
     },
     "provides is correct"
   );
-};
-
-subtest "dist without meta provides" => sub {
-  my $dist = $MFD->from_file('./eg/Provides-Inner.yml');
-  $dist->{include_provides_in_meta} = 0; # Violation! -- rjbs, 2019-04-25
-
-  isa_ok($dist, $MFD);
-
-  my $dir = $dist->make_dist_dir({ dir => $tmpdir });
-
-  for my $f ( @expected ) {
-    ok( -e "$dir/$f", "there's a $f");
-  }
-
-  my $content = file("$dir/META.json")->slurp;
-  my $meta = JSON::PP->new->decode( $content );
-
-  ok(
-    ! exists $meta->{provides},
-    "provides is absent"
-  ) or note explain($meta->{provides});
 };
