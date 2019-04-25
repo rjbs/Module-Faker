@@ -52,6 +52,12 @@ has authors => (
   },
 );
 
+has include_provides_in_meta => (
+  is  => 'ro',
+  isa => 'Bool',
+  default => 1,
+);
+
 # optional CPAN::Meta::Spec fields
 has provides => (
   is => 'ro',
@@ -337,10 +343,15 @@ sub _build__cpan_meta {
     $meta->{$key} = $self->$key;
   }
   # optional fields
-  for my $key ( qw/provides prereqs x_authority/ ) {
+  for my $key ( qw/prereqs x_authority/ ) {
     my $value = $self->$key;
     $meta->{$key} = $value if $value;
   }
+
+  if ($self->provides && $self->include_provides_in_meta) {
+    $meta->{provides} = $self->provides;
+  }
+
   return CPAN::Meta->new( $meta, {lazy_validation => 1} );
 }
 
