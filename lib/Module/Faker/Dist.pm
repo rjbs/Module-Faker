@@ -11,6 +11,7 @@ use Module::Faker::Module;
 use Archive::Any::Create;
 use CPAN::DistnameInfo;
 use CPAN::Meta 2.130880; # github issue #9
+use CPAN::Meta::Merge;
 use CPAN::Meta::Requirements;
 use Data::OptList ();
 use File::Temp ();
@@ -325,6 +326,12 @@ has _manifest_file => (
   },
 );
 
+has more_metadata => (
+  is    => 'ro',
+  isa   => 'HashRef',
+  predicate => 'has_more_metadata',
+);
+
 has _cpan_meta => (
   is => 'ro',
   isa => 'CPAN::Meta',
@@ -352,7 +359,16 @@ sub _build__cpan_meta {
     $meta->{provides} = $self->provides;
   }
 
-  return CPAN::Meta->new( $meta, {lazy_validation => 1} );
+  my $cpanmeta = CPAN::Meta->new( $meta, {lazy_validation => 1} );
+  return $cpanmeta unless $self->has_more_metadata;
+
+  return CPAN::Meta->new(
+    CPAN::Meta::Merge->new(default_version => 2)->merge(
+      $cpanmeta,
+      $self->more_metadata,
+    ),
+    { lazy_validation => 1 }
+  );
 }
 
 has _extras => (
@@ -473,14 +489,13 @@ sub from_struct {
   }
 
   return $self->new({
+    cpan_author => $arg->{author},
     name      => $arg->{name},
     version   => $version,
-    cpan_author => $arg->{author},
-
-    (exists $arg->{abstract} ? (abstract => $arg->{abstract}) : ()),
-    (exists $arg->{version}  ? (version  => $arg->{version})  : ()),
-
     packages  => \@packages,
+
+    map {; (exists $arg->{$_} ? ($_ => $arg->{$_}) : ()) }
+      qw( abstract more_metadata version )
   });
 }
 
