@@ -20,11 +20,48 @@ use Parse::CPAN::Meta 1.4401;
 use Path::Class;
 use Encode qw( encode_utf8 );
 
-# Module::Faker options
-has cpan_author  => (is => 'ro', isa => 'Maybe[Str]', default => 'LOCAL');
-has archive_ext  => (is => 'ro', isa => 'Str', default => 'tar.gz');
-has append       => (is => 'ro', isa => 'ArrayRef[HashRef]', default => sub {[]});
-has mtime        => (is => 'ro', isa => 'Int', predicate => 'has_mtime');
+=head1 SYNOPSIS
+
+Building one dist at a time makes plenty of sense, so Module::Faker::Dist makes
+it easy.  Building dists from definitions in files is also useful for doing
+things in bulk (see L<CPAN::Faker>), so there are a bunch of ways to build
+dists from a definition in a file.
+
+    # Build from a META.yml or META.json file, or the delightful
+    # AUTHOR_Foo-Bar-1.234.tar.gz.dist file, which can be zero bytes and gets
+    # all the relevant data from the filename.
+    my $dist = Module::Faker::Dist->from_file($filename);
+
+META files can contain a key called X_Module_Faker that contains attributes to
+use in constructing the dist.  C<dist> files can contain anything you want, but
+the contents won't do a thing.
+
+You can use the C<new> method on Module::Faker::Dist, of course, but it's a bit
+of a pain.  You might, instead, want to use C<from_struct>, which is very close
+to C<new>, but with more sugar.
+
+=cut
+
+=attr name
+
+This is the name of the dist.  It will usually look like C<Foo-Bar>.
+
+=attr version
+
+This is the version of the dist, usually some kind of versiony string like
+C<1.234> or maybe C<1.2.3>.
+
+=attr abstract
+
+The abstract!  This is a short, pithy description of the distribution, usually
+less than a sentence.
+
+=attr release_status
+
+This is the dist's release status.  (See L<CPAN::Meta::Spec>.)  It defaults to
+C<stable> but C<unstable> and C<testing> are valid values.
+
+=cut
 
 my $DEFAULT_VERSION;
 
@@ -34,13 +71,71 @@ has version        => (is => 'ro', isa => 'Maybe[Str]', default => '0.01');
 has abstract       => (is => 'ro', isa => 'Str', default => 'a great new dist');
 has release_status => (is => 'ro', isa => 'Str', default => 'stable');
 
+=attr cpan_author
+
+This is the PAUSE id of the author, like C<RJBS>.
+
+=attr archive_ext
+
+This is the extension of the archive to build, when you build an archive.  This
+defaults to C<tar.gz>.  C<zip> should work, but right now it doesn't.  So
+probably stuck to C<tar.gz>.  It would be cool to support more attributes in
+the future.
+
+=attr append
+
+This is an arrayref of hashrefs, each of which looks like:
+
+  { file => $filename, content => $character_string }
+
+The content will be UTF-8 encoded and put into a file with the given name.
+
+This feature is a bit weird.  Maybe it will go away eventually.
+
+=attr mtime
+
+If given, this is the epoch seconds to which to set the mtime of the generated
+file.  This is useful in rare occasions.
+
+=cut
+
+# Module::Faker options
+has cpan_author  => (is => 'ro', isa => 'Maybe[Str]', default => 'LOCAL');
+has archive_ext  => (is => 'ro', isa => 'Str', default => 'tar.gz');
+has append       => (is => 'ro', isa => 'ArrayRef[HashRef]', default => sub {[]});
+has mtime        => (is => 'ro', isa => 'Int', predicate => 'has_mtime');
+
+=attr x_authority
+
+This is the C<X_Authority> header that gets put into the META files.
+
+=cut
+
 has x_authority => (is => 'ro', isa => 'Str');
+
+=attr license
+
+This is the meta spec license string for the distribution.  It defaults to
+C<perl_5>.
+
+=cut
 
 has license => (
   is      => 'ro',
   isa     => 'ArrayRef[Str]',
   default => sub { [ 'perl_5' ] },
 );
+
+=attr authors
+
+This is an array of strings who are used as the authors in the dist metadata.
+The default is:
+
+  [ "AUTHOR <AUTHOR@cpan.local>" ]
+
+...where C<AUTHOR> is the C<cpan_author> of the dist.
+
+=cut
 
 has authors => (
   isa  => 'ArrayRef[Str]',
@@ -53,13 +148,32 @@ has authors => (
   },
 );
 
+=attr include_provides_in_meta
+
+This is a bool.  If true, the produced META files will include a C<provides>
+key based on the packages in the dist.  It defaults to false, to match the
+most common behavior of dists in the wild.
+
+=cut
+
 has include_provides_in_meta => (
   is  => 'ro',
   isa => 'Bool',
   default => 0,
 );
 
-# optional CPAN::Meta::Spec fields
+=attr provides
+
+This is a hashref that gets used as the C<provides> in the metadata.
+
+If no provided, it is built from the C<packages> provided in construction.
+
+If no packages were provided, for a dist named Foo-Bar, it defaults to:
+
+  { 'Foo::Bar' => { version => $DIST_VERSION, file => "lib/Foo/Bar.pm" } }
+
+=cut
+
 has provides => (
   is => 'ro',
   isa => 'HashRef',
@@ -99,6 +213,18 @@ sub append_for {
   ];
 }
 
+=attr archive_basename
+
+If written to disk, the archive will be written to...
+
+  $dist->archive_basename . '.' . $dist->archive_ext
+
+The default is:
+
+  $dist->name . '.' . ($dist->version // 'undef')
+
+=cut
+
 has archive_basename => (
   is   => 'ro',
   isa  => 'Str',
@@ -107,6 +233,21 @@ has archive_basename => (
     my ($self) = @_;
     return sprintf '%s-%s', $self->name, __dor($self->version, 'undef');
   },
+);
+
+=attr omitted_files
+
+If given, this is an arrayref of filenames that shouldn't be automatically
+generated and included.
+
+=cut
+
+has omitted_files => (
+  isa  => 'ArrayRef[Str]',
+  traits  => [ 'Array' ],
+  handles => { omitted_files => 'elements' },
+  lazy    => 1,
+  default => sub { [] },
 );
 
 sub __dist_to_pkg { my $str = shift; $str =~ s/-/::/g; return $str; }
@@ -120,6 +261,14 @@ sub _pkgy_name {
 
   return $name;
 }
+
+=attr packages
+
+This is an array of L<Module::Faker::Package> objects.  It's built by
+C<provides> if needed, but you might want to look at using the
+C<L</from_struct>> method to set it up.
+
+=cut
 
 has packages => (
   isa     => 'Module::Faker::Type::Packages',
@@ -157,6 +306,17 @@ sub _build_packages {
   return \@packages;
 }
 
+=method modules
+
+This produces and returns a list of L<Module::Faker::Module> objects,
+representing modules.  Modules, if you're not as steeped in CPAN toolchain
+nonsense, are the C<.pm> files in which packages are defined.
+
+These are produced by combining the packages from C<L</packages>> into files
+based on their C<in_file> attributes.
+
+=cut
+
 sub modules {
   my ($self) = @_;
 
@@ -185,6 +345,17 @@ sub _mk_container_path {
   my $leaf_filename = pop @parts;
   File::Path::mkpath(File::Spec->catdir(@parts));
 }
+
+=method C<make_dist_dir>
+
+  my $directory_name = $dist->make_dist_dir(\%arg);
+
+This returns the name of a directory into which the dist's contents have been
+written.  If a C<dir> argument is provided, the dist will be written to a
+directory beneath that dir.  Otherwise, it will be written below a temporary
+directory.
+
+=cut
 
 sub make_dist_dir {
   my ($self, $arg) = @_;
@@ -228,6 +399,19 @@ sub archive_filename {
   );
 }
 
+=method make_archive
+
+  my $archive_filename = $dist->make_archive(\%arg);
+
+This writes the dist archive file, like a tarball or zip file.  If a C<dir>
+argument is given, it will be written in that directory.  Otherwise, it will be
+written to a temporary directory.  If the C<author_prefix> argument is given
+and true, it will be written under a hashed author dir, like:
+
+  U/US/USERID/Foo-Bar-1.23.tar.gz
+
+=cut
+
 sub make_archive {
   my ($self, $arg) = @_;
   $arg ||= {};
@@ -270,14 +454,6 @@ sub files {
 }
 
 sub _file_class { 'Module::Faker::File' }
-
-has omitted_files => (
-  isa  => 'ArrayRef[Str]',
-  traits  => [ 'Array' ],
-  handles => { omitted_files => 'elements' },
-  lazy    => 1,
-  default => sub { [] },
-);
 
 around BUILDARGS => sub {
   my ($orig, $self, @rest) = @_;
@@ -325,6 +501,12 @@ has _manifest_file => (
     });
   },
 );
+
+=attr more_metadata
+
+This can be given as a hashref of data to merge into the CPAN::Meta files.
+
+=cut
 
 has more_metadata => (
   is    => 'ro',
@@ -409,6 +591,24 @@ has _extras => (
   },
 );
 
+=method from_file
+
+  my $dist = Module::Faker::Dist->from_file($filename);
+
+Given a filename with dist configuration, this builds the dist described by the
+file.
+
+Given a file ending in C<yaml> or C<yml> or C<json>, it's treated as a
+CPAN::Meta file and interpreted as such.  The key C<X_Module_Faker> can be
+present to provide attributes that don't match data found in a meta file.
+
+Given a file ending in C<dist>, all the configuration comes from the filename,
+which should look like this:
+
+  AUTHOR_Dist-Name-1.234.tar.gz.dist
+
+=cut
+
 # TODO: make this a registry -- rjbs, 2008-03-12
 my %HANDLER_FOR = (
   yaml => '_from_meta_file',
@@ -463,6 +663,19 @@ sub _flat_prereqs {
   }
   return %{ $req->as_string_hash };
 }
+
+=method from_struct
+
+  my $dist = Module::Faker::Dist->from_struct(\%arg);
+
+This is sugar over C<new>, working like this:
+
+=for :list
+* packages version defaults to the dist version unless specified
+* packages for dist Foo-Bar defaults to Foo::Bar unless specified
+* if specified, packages is an L<optlist|Data::OptList>
+
+=cut
 
 sub from_struct {
   my ($self, $arg) = @_;
