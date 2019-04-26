@@ -489,13 +489,9 @@ sub from_struct {
   }
 
   return $self->new({
-    cpan_author => $arg->{author},
-    name      => $arg->{name},
+    %$arg,
     version   => $version,
     packages  => \@packages,
-
-    map {; (exists $arg->{$_} ? ($_ => $arg->{$_}) : ()) }
-      qw( abstract more_metadata version )
   });
 }
 
