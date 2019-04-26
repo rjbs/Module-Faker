@@ -7,6 +7,8 @@ Revision history for Module-Faker
         - populate the "file" entry in provides by using the package name,
           when it's left blank in the dist source
         - replace use of auto_deref with Moose native traits
+        - added the "more_metadata" property on Dists, which gets merged into
+          the generated META file
         - Dist now has include_provides_in_meta, defaulting false, controlling
           whether "provides" are put into META files.  It's false to help act
           more like real life, where provides is very rare.
