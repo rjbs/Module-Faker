@@ -453,7 +453,13 @@ sub from_struct {
 
   my $version = exists $arg->{version} ? $arg->{version} : $DEFAULT_VERSION;
 
-  my $specs = Data::OptList::mkopt($arg->{packages});
+  my $specs = Data::OptList::mkopt(
+      ! exists $arg->{packages} ? [ __dist_to_pkg($arg->{name}) ]
+    : ref $arg->{packages}      ? $arg->{packages}
+    : defined $arg->{packages}  ? [ $arg->{packages} ]
+    :                             ()
+  );
+
   my @packages;
   for my $spec (@$specs) {
     my %spec = $spec->[1] ? %{ $spec->[1] } : ();
