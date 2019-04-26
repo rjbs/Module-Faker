@@ -1,6 +1,8 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+
+0.021     2019-04-27 00:16:46+01:00 Europe/London
         - add Dist->from_struct, for making faked dists on the fly
         - support multiple "styles" for packages, like "block" for
           "package PackageName 1.2 { ... }"
