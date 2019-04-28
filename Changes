@@ -1,6 +1,7 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+        - add meta_munger facility to allow creation of really weird metadata
 
 0.021     2019-04-27 00:16:46+01:00 Europe/London
         - add Dist->from_struct, for making faked dists on the fly
