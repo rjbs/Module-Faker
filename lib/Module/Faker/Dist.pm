@@ -11,14 +11,16 @@ use Module::Faker::Module;
 use Archive::Any::Create;
 use CPAN::DistnameInfo;
 use CPAN::Meta 2.130880; # github issue #9
+use CPAN::Meta::Converter;
 use CPAN::Meta::Merge;
 use CPAN::Meta::Requirements;
 use Data::OptList ();
+use Encode qw( encode_utf8 );
 use File::Temp ();
 use File::Path ();
 use Parse::CPAN::Meta 1.4401;
 use Path::Class;
-use Encode qw( encode_utf8 );
+use Storable qw(dclone);
 
 =head1 SYNOPSIS
 
@@ -442,7 +444,7 @@ sub files {
   my ($self) = @_;
   my @files = ($self->modules, $self->_extras, $self->_manifest_file);
   for my $file (@{$self->append}) {
-    next if(grep { $_->filename eq $file->{file} } @files);
+    next if grep { $_->filename eq $file->{file} } @files;
     push(@files,
       $self->_file_class->new(
         filename => $file->{file},
@@ -514,6 +516,33 @@ has more_metadata => (
   predicate => 'has_more_metadata',
 );
 
+=attr meta_munger
+
+If given, this is a coderef that's called just before the CPAN::Meta data for
+the dist is written to disk, an can be used to change things, especially into
+invalid data.  It is expected to return the new content to serialize.
+
+It's called like this:
+
+  $coderef->($struct, { format => $format, version => $version });
+
+...where C<$struct> is the result of C<< $cpan_meta->as_struct >>.
+C<$version> is the version number of the target metafile.  Normally, both
+version 1.4 and 2 are requested.  C<$format> is either C<yaml> or C<json>.
+
+If the munger returns a string instead of a structure, it will be used as the
+content of the file being written.  This lets you put all kinds of nonsense in
+those meta files.  Have fun, go nuts!
+
+=cut
+
+has meta_munger => (
+  isa => 'CodeRef',
+  predicate => 'has_meta_munger',
+  traits    => [ 'Code' ],
+  handles   => { munge_meta => 'execute' },
+);
+
 has _cpan_meta => (
   is => 'ro',
   isa => 'CPAN::Meta',
@@ -576,20 +605,69 @@ has _extras => (
     unless ( grep { $_ eq 'META.json' } $self->omitted_files ) {
       push @files, $self->_file_class->new({
         filename => 'META.json',
-        content  => $self->_cpan_meta->as_string( { version => "2" } ),
+        content  => $self->_meta_file_content(json => 2),
       });
     }
 
     unless ( grep { $_ eq 'META.yml' } $self->omitted_files ) {
       push @files, $self->_file_class->new({
         filename => 'META.yml',
-        content  => $self->_cpan_meta->as_string( { version => "1.4" } ),
+        content  => $self->_meta_file_content(yaml => 1.4),
       });
     }
 
     return \@files;
   },
 );
+
+# This code is based on the code in CPAN::Meta v2.150010
+# -- rjbs, 2019-04-28
+sub _meta_file_content {
+  my ($self, $format, $version) = @_;
+
+  my $meta = $self->_cpan_meta;
+
+  my $struct;
+  if ($meta->meta_spec_version ne $version) {
+    $struct = CPAN::Meta::Converter->new($meta->as_struct)
+                                   ->convert(version => $version);
+  } else {
+    $struct = $meta->as_struct;
+  }
+
+  if ($self->has_meta_munger) {
+    # Is that dclone() paranoia?  Maybe. -- rjbs, 2019-04-28
+    $struct = $self->munge_meta(
+      dclone($struct),
+      {
+        format  => $format,
+        version => $version
+      },
+    );
+
+    return $struct unless ref $struct;
+  }
+
+  my ($data, $backend);
+  if ($format eq 'json') {
+    $backend = Parse::CPAN::Meta->json_backend();
+    local $struct->{x_serialization_backend} = sprintf '%s version %s',
+      $backend, $backend->VERSION;
+    $data = $backend->new->pretty->canonical->encode($struct);
+  } elsif ($format eq 'yaml') {
+    $backend = Parse::CPAN::Meta->yaml_backend();
+    local $struct->{x_serialization_backend} = sprintf '%s version %s',
+      $backend, $backend->VERSION;
+    $data = eval { no strict 'refs'; &{"$backend\::Dump"}($struct) };
+    if ( $@ ) {
+      croak($backend->can('errstr') ? $backend->errstr : $@);
+    }
+  } else {
+    confess "unknown meta format: $format"
+  }
+
+  return $data;
+}
 
 =method from_file
 
