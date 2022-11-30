@@ -44,7 +44,7 @@ methods of the same name.  Valid arguments are:
   dist_class - the class used to fake dists; default: Module::Faker::Dist
 
 The source files are essentially a subset of CPAN::Meta files with some
-optional extra features.  All the you really require are the name and
+optional extra features.  All you really require are the name and
 abstract.  Other bits like requirements can be specified and will be passed
 through.  Out of the box the module will create the main module file based
 on the module name and a single test file.  You can either use the provides
