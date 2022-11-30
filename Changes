@@ -1,6 +1,8 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+
+0.023     2022-11-30 07:52:25-05:00 America/New_York
         - add some more Pod (thanks gregor herrmann and Debian!)
         - update dist metadata
 
