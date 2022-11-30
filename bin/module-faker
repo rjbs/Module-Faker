@@ -2,6 +2,23 @@
 use v5.14.0;
 use warnings;
 # PODNAME: module-faker
+# ABSTRACT: fake up CPAN distributions with Module::Faker
+
+=head1 SYNOPSIS
+
+B<module-faker> [B<-s|--src> STR] [B<-d|--dest> STR] [B<-p|--author-dir>]
+
+=head1 OPTIONS
+
+=for :list
+= B<-s> STR, B<--src> STR
+source directory
+= B<-d> STR, B<--dest> STR
+destination directory
+= B<-p>, B<--author-dir>
+write dists into A/U/AUTHOR dirs
+
+=cut
 
 use Getopt::Long::Descriptive;
 use Module::Faker;
