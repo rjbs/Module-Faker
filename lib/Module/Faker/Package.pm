@@ -34,6 +34,18 @@ sub _format_legacy {
   return $string;
 }
 
+sub _format_legacy_literal {
+  my ($self) = @_;
+
+  my $string = q{};
+
+  $string .= sprintf "package %s;\n", $self->name;
+  $string .= sprintf "our \$VERSION = %s;\n", $self->version
+    if defined $self->version;
+
+  return $string;
+}
+
 sub _format_statement {
   my ($self) = @_;
 
