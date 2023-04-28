@@ -56,6 +56,26 @@ sub _format_block {
   return $string;
 }
 
+sub _format_class {
+  my ($self) = @_;
+
+  my $string = sprintf "class %s%s {\n\n  # Your code here\n\n}\n",
+    $self->name,
+    (defined $self->version ? (q{ } . $self->version) : '');
+
+  return $string;
+}
+
+sub _format_role {
+  my ($self) = @_;
+
+  my $string = sprintf "role %s%s {\n\n  # Your code here\n\n}\n",
+    $self->name,
+    (defined $self->version ? (q{ } . $self->version) : '');
+
+  return $string;
+}
+
 sub as_string {
   my ($self) = @_;
 
