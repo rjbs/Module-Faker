@@ -1,6 +1,7 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+        - add legacy_literal and legacy_block style packages
 
 0.024     2023-04-28 11:48:37+02:00 Europe/Paris
         - add "class" and "role" style packages
