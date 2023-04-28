@@ -58,6 +58,20 @@ sub _format_statement {
   return $string;
 }
 
+sub _format_legacy_block {
+  my ($self) = @_;
+
+  my $version_line = defined $self->version
+    ? sprintf(qq{  our \$VERSION = '%s';\n}, $self->version)
+    : '';
+
+  my $string = sprintf "package %s {\n\n%s  # Your code here\n\n}\n",
+    $self->name,
+    $version_line;
+
+  return $string;
+}
+
 sub _format_block {
   my ($self) = @_;
 
