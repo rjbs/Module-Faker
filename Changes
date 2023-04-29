@@ -1,7 +1,10 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
-        - add legacy_literal and legacy_block style packages
+        - overhaul how styles work, rename them to layouts
+          This is backward incompatible, but the existing code was basically
+          never documented and, as far as I know, only used in the PAUSE test
+          suite.
 
 0.024     2023-04-28 11:48:37+02:00 Europe/Paris
         - add "class" and "role" style packages
