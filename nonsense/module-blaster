@@ -4,26 +4,43 @@ use warnings;
 # PODNAME: module-blaster
 # ABSTRACT: create a random distribution
 
-use Data::Fake qw(Names Text);
+use Data::Fake qw(Core Names Text);
 use Getopt::Long::Descriptive;
+use List::Util qw(uniq);
 use Module::Faker::Dist;
 
-my $ver_x = int rand 3;
-my $ver_y = int rand 3;
+use lib 'nonsense';
+use Vocab qw(noun adj);
 
-my $v = sprintf '%d.%03d', $ver_x, $ver_y;
+my $v;
 
-my $basename = join q{-}, map { ucfirst fake_words(1)->() } (1..3);
+if (1) {
+  my $ver_x = int rand 1000;
+  my $ver_y = int rand 1000;
+
+  $v = sprintf '%d.%03d', $ver_x, $ver_y;
+}
+
+my @base = map { ucfirst noun() } (1 .. fake_int(1,2)->());
+my $distname = join q{-}, @base;
+my $mainmod  = join q{::}, @base;
 
 my $fname   = fake_first_name()->();
 my $lname   = fake_surname()->();
 my $pauseid = uc( substr($fname, 0, 1) . substr($lname, 0, 7));
 
+my @adjs = uniq map {; ucfirst adj() } (1 .. fake_int(0,5)->());
+
 my $dist = Module::Faker::Dist->from_struct({
-  name    => $basename,
+  name    => $distname,
   version => $v,
   cpan_author => $pauseid,
+  packages  => [
+    $mainmod,
+    map {; "$mainmod\::$_" } sort @adjs,
+  ],
 });
 
 my $archive = $dist->make_archive({ dir => '.' });
 say "Produced archive as $archive (cpan author: $pauseid)";
+
