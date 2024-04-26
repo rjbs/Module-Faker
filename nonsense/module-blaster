@@ -1,6 +1,5 @@
 #!perl
-use v5.14.0;
-use warnings;
+use v5.36.0;
 # PODNAME: module-blaster
 # ABSTRACT: create a random distribution
 
@@ -21,7 +20,12 @@ if (1) {
   $v = sprintf '%d.%03d', $ver_x, $ver_y;
 }
 
-my @base = map { ucfirst noun() } (1 .. fake_int(1,2)->());
+my sub make_identifier ($str) {
+  my @bits = split /[^A-Za-z0-9_]/, $str;
+  join q{}, map {; ucfirst } @bits;
+}
+
+my @base = map { make_identifier( noun() ) } (1 .. fake_int(1,2)->());
 my $distname = join q{-}, @base;
 my $mainmod  = join q{::}, @base;
 
@@ -29,7 +33,7 @@ my $fname   = fake_first_name()->();
 my $lname   = fake_surname()->();
 my $pauseid = uc( substr($fname, 0, 1) . substr($lname, 0, 7));
 
-my @adjs = uniq map {; ucfirst adj() } (1 .. fake_int(0,5)->());
+my @adjs = uniq map {; make_identifier( adj() ) } (1 .. fake_int(0,5)->());
 
 my $dist = Module::Faker::Dist->from_struct({
   name    => $distname,
@@ -43,4 +47,4 @@ my $dist = Module::Faker::Dist->from_struct({
 
 my $archive = $dist->make_archive({ dir => '.' });
 say "Produced archive as $archive (cpan author: $pauseid)";
-
+say "- $_" for sort map {; $_->name } $dist->packages;
