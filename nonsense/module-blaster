@@ -1,0 +1,29 @@
+#!perl
+use v5.14.0;
+use warnings;
+# PODNAME: module-blaster
+# ABSTRACT: create a random distribution
+
+use Data::Fake qw(Names Text);
+use Getopt::Long::Descriptive;
+use Module::Faker::Dist;
+
+my $ver_x = int rand 3;
+my $ver_y = int rand 3;
+
+my $v = sprintf '%d.%03d', $ver_x, $ver_y;
+
+my $basename = join q{-}, map { ucfirst fake_words(1)->() } (1..3);
+
+my $fname   = fake_first_name()->();
+my $lname   = fake_surname()->();
+my $pauseid = uc( substr($fname, 0, 1) . substr($lname, 0, 7));
+
+my $dist = Module::Faker::Dist->from_struct({
+  name    => $basename,
+  version => $v,
+  cpan_author => $pauseid,
+});
+
+my $archive = $dist->make_archive({ dir => '.' });
+say "Produced archive as $archive (cpan author: $pauseid)";
