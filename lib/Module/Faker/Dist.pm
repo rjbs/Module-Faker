@@ -168,7 +168,7 @@ has include_provides_in_meta => (
 
 This is a hashref that gets used as the C<provides> in the metadata.
 
-If no provided, it is built from the C<packages> provided in construction.
+If not provided, it is built from the C<packages> provided in construction.
 
 If no packages were provided, for a dist named Foo-Bar, it defaults to:
 
