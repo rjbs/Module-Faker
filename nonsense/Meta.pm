@@ -2,11 +2,15 @@ package Meta;
 use v5.36.0;
 
 use Data::Fake qw( Core Dates );
+use List::Util qw(uniq);
 use Sub::Exporter -setup => [ qw(
   fake_cpan_author
   fake_license
+  fake_package_names
   fake_version
 ) ];
+
+use Vocab qw(noun adj);
 
 sub fake_cpan_author {
   sub { Module::Faker::Blaster::Author->new }
@@ -22,6 +26,24 @@ sub fake_license {
   state @general = qw( open_source restricted unrestricted unknown );
 
   fake_pick(@specific, @general);
+}
+
+my sub make_identifier ($str) {
+  my @bits = split /[^A-Za-z0-9_]/, $str;
+  join q{}, map {; ucfirst } @bits;
+}
+
+sub fake_package_names ($n) {
+  return unless $n >= 1;
+
+  my @base = map { make_identifier( noun() ) } (1 .. fake_int(1,2)->());
+
+  my @names = join q{::}, @base;
+
+  my @adjs = uniq map {; make_identifier( adj() ) } (1 .. $n-1);
+  push @names, map {; join q{::}, $names[0], $_ } @adjs;
+
+  return @names;
 }
 
 package Module::Faker::Blaster::Author {
