@@ -9,6 +9,7 @@ use List::Util qw(uniq);
 use Module::Faker::Dist;
 
 use lib 'nonsense';
+use Meta qw(fake_cpan_author fake_license);
 use Vocab qw(noun adj);
 
 my @v_generators = (
@@ -41,9 +42,7 @@ my @base = map { make_identifier( noun() ) } (1 .. fake_int(1,2)->());
 my $distname = join q{-}, @base;
 my $mainmod  = join q{::}, @base;
 
-my $fname   = fake_first_name()->();
-my $lname   = fake_surname()->();
-my $pauseid = uc( substr($fname, 0, 1) . substr($lname, 0, 7));
+my $author  = fake_cpan_author()->();
 
 my @adjs = uniq map {; make_identifier( adj() ) } (1 .. fake_int(0,5)->());
 
@@ -65,8 +64,10 @@ my sub package ($name) {
 
 my $dist = Module::Faker::Dist->from_struct({
   name    => $distname,
+  authors => [ $author->name_and_email ],
   version => $v,
-  cpan_author => $pauseid,
+  cpan_author => $author->pauseid,
+  license   => [ fake_license()->() ],
   packages  => [
     package($mainmod),
     map {; package("$mainmod\::$_") } sort @adjs,
@@ -74,5 +75,5 @@ my $dist = Module::Faker::Dist->from_struct({
 });
 
 my $archive = $dist->make_archive({ dir => '.' });
-say "Produced archive as $archive (cpan author: $pauseid)";
+say "Produced archive as $archive (cpan author: " . $author->pauseid . ")";
 say "- $_" for sort map {; $_->name } $dist->packages;
