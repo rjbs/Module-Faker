@@ -80,9 +80,8 @@ This is the PAUSE id of the author, like C<RJBS>.
 =attr archive_ext
 
 This is the extension of the archive to build, when you build an archive.  This
-defaults to C<tar.gz>.  C<zip> should work, but right now it doesn't.  So
-probably stuck to C<tar.gz>.  It would be cool to support more attributes in
-the future.
+defaults to C<tar.gz>.  C<zip> works.  Other things might.  Try it and find
+out.
 
 =attr append
 
