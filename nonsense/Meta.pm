@@ -1,8 +1,12 @@
 package Meta;
 use v5.36.0;
 
-use Data::Fake qw( Core );
-use Sub::Exporter -setup => [ qw( fake_cpan_author fake_license ) ];
+use Data::Fake qw( Core Dates );
+use Sub::Exporter -setup => [ qw(
+  fake_cpan_author
+  fake_license
+  fake_version
+) ];
 
 sub fake_cpan_author {
   sub { Module::Faker::Blaster::Author->new }
@@ -59,6 +63,29 @@ package Module::Faker::Blaster::Author {
   }
 
   no Moose;
+}
+
+my @v_generators = (
+  sub {
+    # n.nnn
+    my $ver_x = int rand 10;
+    my $ver_y = int rand 1000;
+
+    return sprintf '%d.%03d', $ver_x, $ver_y;
+  },
+  sub {
+    # YYYYMMDD.nnn
+    my $date = fake_past_datetime('%Y%m%d')->();
+    return sprintf '%d.%03d', $date, int rand 1000;
+  },
+  sub {
+    # x.y.z
+    return join q{.}, map {; int rand 20 } (1..3);
+  },
+);
+
+sub fake_version {
+  fake_pick(@v_generators);
 }
 
 1;
