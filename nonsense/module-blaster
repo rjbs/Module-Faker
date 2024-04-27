@@ -3,6 +3,8 @@ use v5.36.0;
 # PODNAME: module-blaster
 # ABSTRACT: create a random distribution
 
+use lib 'lib';
+
 use Data::Fake qw(Core Dates Names Text);
 use Getopt::Long::Descriptive;
 use List::Util qw(uniq);
@@ -47,14 +49,19 @@ for my $n (1 .. $opt->number) {
 
   my @adjs = uniq map {; make_identifier( adj() ) } (1 .. fake_int(0,5)->());
 
+  my $ext = fake_weighted(
+    [ 'tar.gz' => 4 ],
+    [ zip      => 1 ],
+  )->();
 
   my $dist = Module::Faker::Dist->from_struct({
     name    => $distname,
-    authors => [ $author->name_and_email ],
     version => fake_version()->(),
+    authors     => [ $author->name_and_email ],
     cpan_author => $author->pauseid,
-    license   => [ fake_license()->() ],
-    packages  => [
+    license     => [ fake_license()->() ],
+    archive_ext => $ext,
+    packages    => [
       package($mainmod),
       map {; package("$mainmod\::$_") } sort @adjs,
     ],
