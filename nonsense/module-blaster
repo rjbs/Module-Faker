@@ -4,20 +4,12 @@ use v5.36.0;
 # ABSTRACT: create a random distribution
 
 use lib 'lib';
+use lib 'nonsense';
 
-use Data::Fake qw(Core Dates Names Text);
+use Data::Fake qw(Core CPAN Dates Names Text);
 use Getopt::Long::Descriptive;
 use List::Util qw(uniq);
 use Module::Faker::Dist;
-
-use lib 'nonsense';
-use Meta qw(
-  fake_cpan_author
-  fake_cpan_distribution
-  fake_license
-  fake_package_names
-  fake_version
-);
 
 my ($opt, $usage) = describe_options(
   '%c %o',

@@ -1,16 +1,20 @@
-package Meta;
+package Data::Fake::CPAN;
 use v5.36.0;
 
 use Data::Fake qw( Core Dates );
 use List::Util qw(uniq);
-use Sub::Exporter -setup => [ qw(
-  fake_cpan_author
-  fake_cpan_distribution
-  fake_license
-  fake_package_names
-  fake_prereqs
-  fake_version
-) ];
+
+use Sub::Exporter -setup => {
+  groups  => { default => [ '-all' ] },
+  exports => [ qw(
+    fake_cpan_author
+    fake_cpan_distribution
+    fake_license
+    fake_package_names
+    fake_prereqs
+    fake_version
+  ) ],
+};
 
 use Vocab qw(noun adj);
 
