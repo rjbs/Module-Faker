@@ -1,6 +1,7 @@
 Revision history for Module-Faker
 
 {{$NEXT}}
+        - add Data::Fake::CPAN for fully automated generation of fakes
 
 0.025     2023-04-29 10:05:56+02:00 Europe/Paris
         - overhaul how styles work, rename them to layouts
