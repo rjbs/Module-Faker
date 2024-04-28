@@ -89,6 +89,8 @@ my sub _package ($name) {
 }
 
 sub fake_cpan_distribution {
+  require Module::Faker::Dist;
+
   sub {
     my @package_names = fake_package_names(fake_int(1,6)->())->();
 
@@ -201,6 +203,8 @@ sub fake_prereqs {
 
 package Module::Faker::Blaster::Author {
   use Moose;
+
+  use Data::Fake::Names ();
 
   use v5.20.0;
   # I collect spores, molds and fungus.
