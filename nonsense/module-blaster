@@ -4,6 +4,9 @@ use warnings;
 # PODNAME: module-blaster
 # ABSTRACT: create a random CPAN distribution
 
+# This goofy little program spits out one or more faked up CPAN distributions.
+# They should be valid, but will have no useful code in them.
+
 use lib 'lib';
 
 use Data::Fake qw(CPAN);
