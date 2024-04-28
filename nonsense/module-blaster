@@ -11,80 +11,22 @@ use List::Util qw(uniq);
 use Module::Faker::Dist;
 
 use lib 'nonsense';
-use Meta qw(fake_cpan_author fake_license fake_package_names fake_version);
+use Meta qw(
+  fake_cpan_author
+  fake_cpan_distribution
+  fake_license
+  fake_package_names
+  fake_version
+);
 
 my ($opt, $usage) = describe_options(
   '%c %o',
   [ 'number|n=i', 'how many dists to blast out', { default => 1 } ],
 );
 
-my sub package ($name) {
-  state $config = {
-    layout => {
-      pkgword => fake_weighted(
-        [ package => 4 ],
-        [ class   => 1 ],
-        [ role    => 1 ],
-      )->(),
-      style   => fake_pick(qw( statement block ))->(),
-      version => fake_pick(qw( our our-literal inline ))->(),
-    },
-  };
-
-  return $name => $config;
-}
-
-sub fake_prereqs {
-  my %prereqs;
-
-  my $mk_type = fake_weighted(
-    [ configure =>  1 ],
-    [ runtime   => 10 ],
-    [ build     =>  2 ],
-    [ test      =>  3 ],
-    [ develop   =>  2 ],
-  );
-
-  my $mk_phase = fake_weighted(
-    [ conflicts   =>  1 ],
-    [ recommends  =>  3 ],
-    [ requires    => 15 ],
-    [ suggests    =>  1 ],
-  );
-
-  for (1 .. fake_int(0, 20)->()) {
-    my $type  = $mk_type->();
-    my $phase = $mk_phase->();
-
-    my ($package) = fake_package_names(1);
-    $prereqs{$phase}{$type}{$package} = fake_version()->();
-  }
-
-  return \%prereqs;
-}
-
 for my $n (1 .. $opt->number) {
-  my @package_names = fake_package_names(fake_int(1,6)->());
-
-  my $author  = fake_cpan_author()->();
-
-  my $ext = fake_weighted(
-    [ 'tar.gz' => 4 ],
-    [ zip      => 1 ],
-  )->();
-
-  my $dist = Module::Faker::Dist->from_struct({
-    name    => ($package_names[0] =~ s/::/-/gr),
-    version => fake_version()->(),
-    authors     => [ $author->name_and_email ],
-    cpan_author => $author->pauseid,
-    license     => [ fake_license()->() ],
-    archive_ext => $ext,
-    packages    => [ map {; package($_) } sort @package_names ],
-    prereqs     => fake_prereqs(),
-  });
-
+  my $dist = fake_cpan_distribution()->();
   my $archive = $dist->make_archive({ dir => '.' });
-  say "Produced archive as $archive (cpan author: " . $author->pauseid . ")";
+  say "Produced archive as $archive (cpan author: " . $dist->cpan_author . ")";
   say "- $_" for sort map {; $_->name } $dist->packages;
 }

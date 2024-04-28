@@ -5,8 +5,10 @@ use Data::Fake qw( Core Dates );
 use List::Util qw(uniq);
 use Sub::Exporter -setup => [ qw(
   fake_cpan_author
+  fake_cpan_distribution
   fake_license
   fake_package_names
+  fake_prereqs
   fake_version
 ) ];
 
@@ -14,6 +16,46 @@ use Vocab qw(noun adj);
 
 sub fake_cpan_author {
   sub { Module::Faker::Blaster::Author->new }
+}
+
+my sub _package ($name) {
+  state $config = {
+    layout => {
+      pkgword => fake_weighted(
+        [ package => 4 ],
+        [ class   => 1 ],
+        [ role    => 1 ],
+      )->(),
+      style   => fake_pick(qw( statement block ))->(),
+      version => fake_pick(qw( our our-literal inline ))->(),
+    },
+  };
+
+  return $name => $config;
+}
+
+sub fake_cpan_distribution {
+  sub {
+    my @package_names = fake_package_names(fake_int(1,6)->())->();
+
+    my $author  = fake_cpan_author()->();
+
+    my $ext = fake_weighted(
+      [ 'tar.gz' => 4 ],
+      [ zip      => 1 ],
+    )->();
+
+    my $dist = Module::Faker::Dist->from_struct({
+      name    => ($package_names[0] =~ s/::/-/gr),
+      version => fake_version()->(),
+      authors     => [ $author->name_and_email ],
+      cpan_author => $author->pauseid,
+      license     => [ fake_license()->() ],
+      archive_ext => $ext,
+      packages    => [ map {; _package($_) } sort @package_names ],
+      prereqs     => fake_prereqs()->(),
+    });
+  }
 }
 
 sub fake_license {
@@ -36,14 +78,46 @@ my sub make_identifier ($str) {
 sub fake_package_names ($n) {
   return unless $n >= 1;
 
-  my @base = map { make_identifier( noun() ) } (1 .. fake_int(1,2)->());
+  sub {
+    my @base = map { make_identifier( noun() ) } (1 .. fake_int(1,2)->());
+    my @names = join q{::}, @base;
 
-  my @names = join q{::}, @base;
+    my @adjs = uniq map {; make_identifier( adj() ) } (1 .. $n-1);
+    push @names, map {; join q{::}, $names[0], $_ } @adjs;
 
-  my @adjs = uniq map {; make_identifier( adj() ) } (1 .. $n-1);
-  push @names, map {; join q{::}, $names[0], $_ } @adjs;
+    return @names;
+  }
+}
 
-  return @names;
+sub fake_prereqs {
+  sub {
+    my %prereqs;
+
+    my $mk_phase = fake_weighted(
+      [ configure =>  1 ],
+      [ runtime   => 10 ],
+      [ build     =>  2 ],
+      [ test      =>  3 ],
+      [ develop   =>  2 ],
+    );
+
+    my $mk_type = fake_weighted(
+      [ conflicts   =>  1 ],
+      [ recommends  =>  3 ],
+      [ requires    => 15 ],
+      [ suggests    =>  1 ],
+    );
+
+    for (1 .. fake_int(0, 20)->()) {
+      my $phase = $mk_phase->();
+      my $type  = $mk_type->();
+
+      my ($package) = fake_package_names(1)->();
+      $prereqs{$phase}{$type}{$package} = fake_version()->();
+    }
+
+    return \%prereqs;
+  }
 }
 
 package Module::Faker::Blaster::Author {
