@@ -2,15 +2,12 @@
 use v5.20.0;
 use warnings;
 # PODNAME: module-blaster
-# ABSTRACT: create a random distribution
+# ABSTRACT: create a random CPAN distribution
 
 use lib 'lib';
-use lib 'nonsense';
 
-use Data::Fake qw(Core CPAN Dates Names Text);
+use Data::Fake qw(CPAN);
 use Getopt::Long::Descriptive;
-use List::Util qw(uniq);
-use Module::Faker::Dist;
 
 my ($opt, $usage) = describe_options(
   '%c %o',
