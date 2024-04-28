@@ -1,6 +1,7 @@
 package Module::Faker::Appendix;
 # ABSTRACT: a thing that appends
 
+use v5.20.0;
 use Moose::Role;
 
 has append => (

@@ -1,6 +1,7 @@
 package Module::Faker::Dist;
 # ABSTRACT: a fake CPAN distribution
 
+use v5.20.0;
 use Moose;
 
 use Module::Faker::File;

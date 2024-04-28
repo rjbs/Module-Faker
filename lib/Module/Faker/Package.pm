@@ -1,6 +1,7 @@
 package Module::Faker::Package;
 # ABSTRACT: a faked package in a faked module
 
+use v5.20.0;
 use Moose;
 
 use Moose::Util::TypeConstraints;

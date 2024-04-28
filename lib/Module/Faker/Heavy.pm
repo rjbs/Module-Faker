@@ -1,4 +1,4 @@
-use strict;
+use v5.20.0;
 use warnings;
 package Module::Faker::Heavy;
 # ABSTRACT: where the fake sausage gets made

@@ -1,6 +1,7 @@
 package Module::Faker::File;
 # ABSTRACT: a fake file in a fake dist
 
+use v5.20.0;
 use Moose;
 with 'Module::Faker::Appendix';
 

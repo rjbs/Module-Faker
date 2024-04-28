@@ -1,5 +1,32 @@
 package Data::Fake::CPAN;
-use v5.36.0;
+use v5.20.0;
+use warnings;
+
+# Back off, man, I'm a scientist.
+use experimental qw(lexical_subs postderef signatures);
+
+=head1 SYNOPSIS
+
+  use Data::Fake qw(CPAN);
+
+  my $dist = fake_cpan_distribution()->();
+
+  my $archive = $dist->make_archive({ dir => '.' });
+  say "Produced archive as $archive (cpan author: " . $dist->cpan_author . ")";
+  say "- $_" for sort map {; $_->name } $dist->packages;
+
+This is a Data::Fake plugin for generating CPAN distributions.  Right now, it
+can't be configured in any way, but future revisions might add some options.
+You can use this to generate libraries to test your CPAN-related tooling, to
+test L<PAUSE|https://pause.perl.org>.  Make 10,000 and host your own competing
+CPAN.  The possibilities are endless.
+
+All the C<fake_...> functions exported by Data::Fake::CPAN are exported by
+default, and you're meant to use them via C<use Data::Fake>.  Like the rest of
+Data::Fake generators, they return subroutines that you must call to get the
+actual faked data.
+
+=cut
 
 use Data::Fake qw( Core Dates );
 use List::Util qw(uniq);
@@ -16,9 +43,34 @@ use Sub::Exporter -setup => {
   ) ],
 };
 
+=func fake_cpan_author
+
+This generator generates objects representing CPAN authors.  These methods are
+provided
+
+=for :list
+* given_name - a first name from Data::Fake::Names
+* surname - a surname from Data::Fake::Names
+* full_name - given name, space, surname
+* pauseid - an all caps PAUSE user id
+* email_address - an email address
+* name_and_email - a string in the form "full_name <email_address>"
+
+If you call this generator many times, you might get duplicated data, but the
+odds are not high.
+
+=cut
+
 sub fake_cpan_author {
   sub { Module::Faker::Blaster::Author->new }
 }
+
+=func fake_cpan_distribution
+
+This creates an entire CPAN distribution, as a Module::Faker::Dist object.  It
+will contain at least one package, and possibly several.
+
+=cut
 
 my sub _package ($name) {
   state $config = {
@@ -60,6 +112,13 @@ sub fake_cpan_distribution {
   }
 }
 
+=func fake_license
+
+This generator will spit out license values for a CPAN::Meta file, like
+C<perl_5> or C<openssl> or C<unknown>.
+
+=cut
+
 sub fake_license {
   state @specific = qw(
     agpl_3 apache_1_1 apache_2_0 artistic_1 artistic_2 bsd freebsd gfdl_1_2
@@ -71,6 +130,15 @@ sub fake_license {
 
   fake_pick(@specific, @general);
 }
+
+=func fake_package_names
+
+  my $generator = fake_package_names($n);
+
+The constructed generator will return I<n> package names.  The first package
+name will be a prefix of all the rest of the package names.
+
+=cut
 
 my sub make_identifier ($str) {
   my @bits = split /[^A-Za-z0-9_]/, $str;
@@ -90,6 +158,15 @@ sub fake_package_names ($n) {
     return @names;
   }
 }
+
+=func fake_prereqs
+
+This generator will produce a reference to a hash that can be used as the
+C<prereqs> entry in a CPAN::Meta file.  Various type and phase combinations
+will be produced with unevenly distributed probabilities.  All package names
+will be faked with C<fake_package_names>.
+
+=cut
 
 sub fake_prereqs {
   sub {
@@ -124,7 +201,10 @@ sub fake_prereqs {
 
 package Module::Faker::Blaster::Author {
   use Moose;
-  use v5.36.0;
+
+  use v5.20.0;
+  # I collect spores, molds and fungus.
+  use experimental qw(lexical_subs postderef signatures);
 
   has given_name => (
     is      => 'ro',
