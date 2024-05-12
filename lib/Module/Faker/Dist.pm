@@ -415,11 +415,33 @@ and true, it will be written under a hashed author dir, like:
 
 =cut
 
+package
+  Module::Faker::Dist::ZipCreator {
+
+  use parent 'Archive::Any::Create::Zip';
+
+  sub add_file {
+    my $self = shift;
+    my($file, $data) = @_;
+
+    my $member = $self->SUPER::add_file($file, $data);
+    $member->unixFileAttributes(0644);
+
+    return $member;
+  }
+}
+
 sub make_archive {
   my ($self, $arg) = @_;
   $arg ||= {};
 
   my $dir = $arg->{dir} || File::Temp::tempdir;
+
+  local $Archive::Any::Create::Type2Class{zip} = [
+    'Module::Faker::Dist::ZipCreator'
+  ];
+
+  local $INC{'Module/Faker/Dist/ZipCreator.pm'} = 1;
 
   my $archive   = Archive::Any::Create->new;
   my $container = $self->archive_basename;
