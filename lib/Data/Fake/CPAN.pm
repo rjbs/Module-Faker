@@ -2,6 +2,8 @@ package Data::Fake::CPAN;
 use v5.20.0;
 use warnings;
 
+# ABSTRACT: a Data::Fake plugin for CPAN data and distributions
+
 # Back off, man, I'm a scientist.
 use experimental qw(lexical_subs postderef signatures);
 
