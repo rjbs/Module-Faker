@@ -437,6 +437,10 @@ sub make_archive {
 
   my $dir = $arg->{dir} || File::Temp::tempdir;
 
+  # This is, admittedly, sort of bananas.  We're doing this because by default,
+  # Archive::Any::Create would make the files a+w.  PAUSE will reject uploaded
+  # archives with files like that, and we want these archives to be useful for
+  # testing PAUSE.
   local $Archive::Any::Create::Type2Class{zip} = [
     'Module::Faker::Dist::ZipCreator'
   ];
