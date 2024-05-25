@@ -20,7 +20,6 @@ ok(
   "we got the mostly-auto dist",
 );
 
-
 is((stat("$tmpdir/Mostly-Auto-0.01.tar.gz"))[9], 100, "got mtime set");
 
 subtest "from YAML file" => sub {
